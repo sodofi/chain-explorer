@@ -4,11 +4,7 @@ import json
 import requests
 import aiohttp
 import re
-import datetime
-import openai
-
-from openai.error import RateLimitError
-import asyncio
+import datetime 
 
 api_response = {
     "success": True,
@@ -224,12 +220,169 @@ api_response = {
 with open('tokens.json') as f:
     tokens = json.load(f)
     discord_token = tokens['discord']
-    openai_token = tokens['openai']  # Assuming you've added your OpenAI API key to your tokens.json
-
-# Setup OpenAI API
-openai.api_key = openai_token
-
+    
 # TODO: create a library of api responses.
+
+# def parse_api_response(response):
+#     # parses API response into a human-readable format
+#     # Args: the API response as a JSON object
+#     # Returns: a human-readable string describing the wallet's achievements
+#     wallet_address = response["story"]["walletId"]
+#     ens_domain = response["story"]["ensName"]
+#     creation_date  = datetime.datetime.fromtimestamp(response['story']['walletDOBTimestamp'])
+#     latest_transaction_date = datetime.datetime.fromtimestamp(response['story']['latestTransactionDateTimestamp'])
+    
+#     number_of_nfts = response["story"]["numberOfNftsOwned"]
+#     nft_achievements = []
+#     for nft_achievement in response["story"]["nftAchievements"]:
+#         title = nft_achievement["title"]
+#         description = nft_achievement["description"]
+#         # image_url = nft_achievement["displayAsset"]["imageUrl"]
+#         nft_achievements.append((title, description))
+        
+#     defi_achievements = []
+#     for defi_achievement in response["story"]["deFiAchievements"]:
+#         title = defi_achievement["title"]
+#         description = defi_achievement["description"]
+#         # image_url = defi_achievement["displayAsset"]["imageUrl"]
+#         defi_achievements.append((title, description))
+        
+#     community_achievements = []
+#     for community_achievement in response["story"]["communityAchievements"]:
+#         title = community_achievement["title"]
+#         description = community_achievement["description"]
+#         # image_url = community_achievement["displayAsset"]["imageUrl"]
+#         community_achievements.append((title, description))
+
+#     vibe_achievements = []
+#     for vibe_achievement in response["story"]["vibeAchievements"]:
+#         title = vibe_achievement["title"]
+#         description = vibe_achievement["description"]
+#         # image_url = vibe_achievement["displayAsset"]["imageUrl"]
+#         vibe_achievements.append((title, description))
+        
+#     # TODO: return as list
+#     # TODO: render each as an image
+#     return (
+#         f"The wallet {wallet_address} belongs to {ens_domain}. This wallet was "
+        
+#         f"created on {creation_date} and their latest transaction was on "
+#         f"{latest_transaction_date}.\n\n"
+#         f"They own {number_of_nfts} NFTs including:\n"
+#         f"{nft_achievements}\n\n"
+#         f"Evidence of their participation in DeFi and money markets:\n"
+#         f"{defi_achievements}\n\n"
+#         f"Evidence of participation in web3 communities:\n"
+#         f"{community_achievements}\n\n"
+#         f"Evidence of engagements within the web3 ecosystem:\n"
+#         f"{vibe_achievements}"
+#     )
+
+def test2(response):
+    wallet_address = response["story"]["walletId"]
+    ens_domain = response["story"]["ensName"]
+    creation_date = response["story"]["walletDOBTimestamp"]
+    latest_transaction_date = response["story"]["latestTransactionDateTimestamp"]
+    
+    number_of_nfts = response["story"]["numberOfNftsOwned"]
+    nft_achievements = []
+    for nft_achievement in response["story"]["nftAchievements"]:
+        title = nft_achievement["title"]
+        description = nft_achievement["description"]
+        # image_url = nft_achievement["displayAsset"]["imageUrl"]
+        nft_achievements.append((title, description))
+        
+    defi_achievements = []
+    for defi_achievement in response["story"]["deFiAchievements"]:
+        title = defi_achievement["title"]
+        description = defi_achievement["description"]
+        # image_url = defi_achievement["displayAsset"]["imageUrl"]
+        defi_achievements.append((title, description))
+        
+    community_achievements = []
+    for community_achievement in response["story"]["communityAchievements"]:
+        title = community_achievement["title"]
+        description = community_achievement["description"]
+        # image_url = community_achievement["displayAsset"]["imageUrl"]
+        community_achievements.append((title, description))
+
+    vibe_achievements = []
+    for vibe_achievement in response["story"]["vibeAchievements"]:
+        title = vibe_achievement["title"]
+        description = vibe_achievement["description"]
+        # image_url = vibe_achievement["displayAsset"]["imageUrl"]
+        vibe_achievements.append((title, description))
+        
+    # TODO: return as list
+    # TODO: render each as an image
+    return (
+        f"The wallet {wallet_address} belongs to {ens_domain}. This wallet was "
+        f"created on {creation_date} and their latest transaction was on "
+        f"{latest_transaction_date}.\n\n"
+        f"They own {number_of_nfts} NFTs including:\n"
+        f"{nft_achievements}\n\n"
+        f"Evidence of their participation in DeFi and money markets:\n"
+        f"{defi_achievements}\n\n"
+        f"Evidence of participation in web3 communities:\n"
+        f"{community_achievements}\n\n"
+        f"Evidence of engagements within the web3 ecosystem:\n"
+        f"{vibe_achievements}"
+    )
+
+def parse_api_response(response):
+    # parses API response into a human-readable format
+    # Args: the API response as a JSON object
+    # Returns: a human-readable string describing the wallet's achievements
+    wallet_address = response["walletId"]
+    ens_domain = response["ensName"]
+    creation_date = response["walletDOBTimestamp"]
+    latest_transaction_date = response["latestTransactionDateTimestamp"]
+    
+    number_of_nfts = response["numberOfNftsOwned"]
+
+    # number_of_nfts = len(response["nftAchievements"])
+    nft_achievements = []
+    for nft_achievement in response["nftAchievements"]:
+        title = nft_achievement["title"]
+        description = nft_achievement["description"]
+        image_url = nft_achievement["displayAsset"]["imageUrl"]
+        nft_achievements.append((title, description, image_url))
+
+    defi_achievements = []
+    for defi_achievement in response["defiAchievements"]:
+        title = defi_achievement["title"]
+        description = defi_achievement["description"]
+        image_url = defi_achievement["displayAsset"]["imageUrl"]
+        defi_achievements.append((title, description, image_url))
+
+    community_achievements = []
+    for community_achievement in response["communityAchievements"]:
+        title = community_achievement["title"]
+        description = community_achievement["description"]
+        image_url = community_achievement["displayAsset"]["imageUrl"]
+        community_achievements.append((title, description, image_url))
+
+    vibe_achievements = []
+    for vibe_achievement in response["vibeAchievements"]:
+        title = vibe_achievement["title"]
+        description = vibe_achievement["description"]
+        image_url = vibe_achievement["displayAsset"]["imageUrl"]
+        vibe_achievements.append((title, description, image_url))
+
+    return (
+        f"The wallet {wallet_address} belongs to {ens_domain}. This wallet was "
+        f"created on {creation_date} and their latest transaction was on "
+        f"{latest_transaction_date}.\n\n"
+        f"They own {number_of_nfts} NFTs including:\n"
+        f"{nft_achievements}\n\n"
+        f"Evidence of their participation in DeFi and money markets:\n"
+        f"{defi_achievements}\n\n"
+        f"Evidence of participation in web3 communities:\n"
+        f"{community_achievements}\n\n"
+        f"Evidence of engagements within the web3 ecosystem:\n"
+        f"{vibe_achievements}"
+    )
+
 
 class ChatBot(discord.Client):
     def __init__(self, *args, **kwargs):
@@ -238,12 +391,13 @@ class ChatBot(discord.Client):
         
 
     async def on_ready(self):
-        print("Bot 2 is ready!")
+        print("Bot is ready!")
 
     async def on_message(self, message):
         if message.author == self.user:  # Ignore bot's own messages
             return
         
+        # add tell me about pattern
         eth_address_pattern = r"0x[a-fA-F0-9]{40}"
         match = re.search(eth_address_pattern, message.content)
         
@@ -256,6 +410,7 @@ class ChatBot(discord.Client):
 
             try:
                 await self.wait_for('message', timeout=30.0, check=check)
+                # parse response
             #     api_url = f"https://www.chainstory.xyz/api/story/getStory?walletId={address}"
 
             #     if address in self.api_responses:
@@ -291,25 +446,50 @@ class ChatBot(discord.Client):
                 await message.channel.send('{address} belongs to ' + {api_response['story']['ensName']} + 
                                            '\n They own {}Sure! Ask me about ENS domain, NFTs owned, vibe achievements, community achievements, or defi achievements')
             
+                await message.channel.send(parse_api_response(api_response))
             except:
                 await message.channel.send('You took too long to reply. Please send a wallet address or ENS so I can tell you about them!')
         
-        elif "tell me about " in message.content:
+        elif ".eth" in message.content:
             await message.channel.send('You provided an ENS domain! What would you like to know about it?')
         
-                        
-        if message.content.startswith("!chatgpt"):
-            query = message.content[len("!chatgpt "):]
-            try:
-                # response = openai.Completion.create(engine="davinci", prompt=query, max_tokens=150)
-                response = openai.Completion.create(model="text-davinci-003", prompt=query, temperature=0.6)
-                await message.channel.send(response.choices[0].text.strip())
-            except RateLimitError:
-                await message.channel.send("Sorry, I'm getting too many requests right now. Please try again later.")
-                await asyncio.sleep(10)  # Introducing a delay. Adjust as needed.
-                
+        if message.content.startswith("!test"):
+            ens_domain = message.content.split(" ")[1]
+            api_url = f"https://www.chainstory.xyz/api/story/getStory?walletId={ens_domain}"
 
-            
+            try:
+                # response = requests.get(api_url)
+                # data = response.json()
+                
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(api_url) as response:
+                        if response.status != 200:
+                            await message.channel.send(f"Error {response.status}: Unable to retrieve story for the provided ENS domain.")
+                            return
+                        
+                        data = await response.json()
+
+                if data.get('success') and data.get('story'):
+                    # story = data['story']
+                    # ens_name = story.get('ensName')
+                    # nfts_owned = story.get('numberOfNftsOwned')
+                    # vibe_achievements = story.get('vibeAchievements')
+                    
+                    # reply = (f"ENS Name: {ens_name}\n"
+                    #         f"Number of NFTs Owned: {nfts_owned}\n"
+                    #         f"Vibe Achievements: {', '.join([achievement['title'] for achievement in vibe_achievements])}\n")
+                    # await message.channel.send(reply)
+                    await message.channel.send(test2(data))
+                else:
+                    await message.channel.send("Unable to retrieve story for the provided ENS domain.")
+
+            except Exception as e:
+                await message.channel.send(f"Error fetching data: {str(e)}")
+        
+        if message.content.startswith("test response"):
+            await message.channel.send(test2(api_response))
+            # await message.channel.send(parse_api_response(api_response))
+                       
         if "ENS" in message.content:
             await message.channel.send('Their ENS domain is ' + api_response['story']['ensName'])
         
@@ -342,14 +522,84 @@ class ChatBot(discord.Client):
         elif message.content.startswith("!vibeAchievements"):
             achievements = [ach['title'] for ach in api_response['story']['vibeAchievements']]
             await message.channel.send(", ".join(achievements))
-            
         
         # Add more commands as necessary
 
     
+# class SimpleBot(discord.Client):
+#     async def on_ready(self):
+#         print("Bot is ready!")
+
+#     async def on_message(self, message):
+#         if message.content.startswith("!ens"):
+#             ens_domain = message.content.split(" ")[1]
+#             api_url = f"https://www.chainstory.xyz/api/story/getStory?walletId={ens_domain}"
+
+#             try:
+#                 # response = requests.get(api_url)
+#                 # data = response.json()
+                
+#                 async with aiohttp.ClientSession() as session:
+#                     async with session.get(api_url) as response:
+#                         if response.status != 200:
+#                             await message.channel.send(f"Error {response.status}: Unable to retrieve story for the provided ENS domain.")
+#                             return
+                        
+#                         data = await response.json()
+
+#                 if data.get('success') and data.get('story'):
+#                     story = data['story']
+#                     ens_name = story.get('ensName')
+#                     nfts_owned = story.get('numberOfNftsOwned')
+#                     vibe_achievements = story.get('vibeAchievements')
+                    
+#                     reply = (f"ENS Name: {ens_name}\n"
+#                             f"Number of NFTs Owned: {nfts_owned}\n"
+#                             f"Vibe Achievements: {', '.join([achievement['title'] for achievement in vibe_achievements])}\n")
+#                     await message.channel.send(reply)
+#                 else:
+#                     await message.channel.send("Unable to retrieve story for the provided ENS domain.")
+
+#             except Exception as e:
+#                 await message.channel.send(f"Error fetching data: {str(e)}")
+
 if __name__ == "__main__":
     intents = discord.Intents.default()
     intents.message_content = True
     bot = ChatBot(intents=intents)
     bot.run(discord_token)
     
+# # There should be a file called 'tokens.json' inside the same folder as this file
+# token_path = 'tokens.json'
+# if not os.path.isfile(token_path):
+#     raise Exception(f"{token_path} not found!")
+# with open(token_path) as f:
+#     # If you get an error here, it means your token is formatted incorrectly. Did you put it in quotes?
+#     tokens = json.load(f)
+#     discord_token = tokens['discord']
+
+# class Bot(discord.Client):
+#     def __init__(self):
+#         intents = discord.Intents.default()
+#         intents.message_content = True
+#         super().__init__(command_prefix='.', intents=intents)
+#         # super().__init__()
+
+#     def on_ready(self):
+#         print("Bot is ready!")
+
+#     def on_message(self, message):
+#         if message.content.startswith("!ens"):
+#             message.channel.send("Hello world!!!!")
+#             # ens_domain = message.content[4:]
+#             # api_response = requests.get("https://api.example.com/ens/{}".format(ens_domain))
+#             # if api_response.status_code == 200:
+#             #     user_history = api_response.json()
+#             #     message.channel.send("Here is the user's on-chain history:")
+#             #     message.channel.send(user_history)
+#             # else:
+#             #     message.channel.send("Error getting user history: {}".format(api_response.status_code))
+
+# if __name__ == "__main__":
+#     bot = Bot()
+#     bot.run(discord_token)
