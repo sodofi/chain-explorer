@@ -1,0 +1,534 @@
+{
+    "next": null,
+    "prev": null,
+    "items": [
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..ABg6j0NNJ-fHb1hb7EwPf4BzMm9xR8wt04_lqF5wuCSS_VWBVjnCS7PL-c_2mb2uEEEzyKKpqRePfNvqCjXrDg",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:08.959Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:08.958Z",
+          "expirationDate": "2023-10-01T18:41:08.958Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:S++L4qqtpwmO1qccgJVL6znsxsPJ1n1pWF1qzFc5dkQ=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "POAP"
+          }
+        },
+        "metadata": null
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..JOZf1bpCwsYTFCOeZKgFv3pLBFHMBnBCOD-g0i2uObY5pORdytPYKwVX_CYmwfXteT0kA50McmeykDVclL_0CA",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:08.840Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:08.840Z",
+          "expirationDate": "2023-10-01T18:41:08.840Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:LF8nVCSNYQOvbxJbWpAL6cbyH3Z26SZKUGYwnujA1FQ=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "EthGasProvider"
+          }
+        },
+        "metadata": {
+          "group": "Gas fees spent",
+          "platform": {
+            "id": "ETH",
+            "icon": "https://passport.gitcoin.co/assets/ethereumStampIcon.svg",
+            "name": "ETH",
+            "description": "ETH possession and transaction verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "EthGasProvider",
+          "description": "At least 0.5 ETH in gas fees spent",
+          "hash": "0xead90b8cb4c9d13e9260d61a08c39d6125c9f2b934dbfcb96ec0e310daf45f38"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..RBP0GJ58uBXfFEm8jJ3LmEnON6E8eO7D-v9aoN8hgfFp21TTgxVvw6LvXx5bIyjfMlbsSusbJdxtEqGxyzKtDQ",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:05.955Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:05.955Z",
+          "expirationDate": "2023-10-01T18:41:05.955Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:+zclykIKmZfQl1mqhS4kzBNPMQvFgPgxnQCzY4uGd1o=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "EthGTEOneTxnProvider"
+          }
+        },
+        "metadata": {
+          "group": "Transactions",
+          "platform": {
+            "id": "ETH",
+            "icon": "https://passport.gitcoin.co/assets/ethereumStampIcon.svg",
+            "name": "ETH",
+            "description": "ETH possession and transaction verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "EthGTEOneTxnProvider",
+          "description": "At least 1 ETH transaction",
+          "hash": "0xf83912da72a27a9b4d36beb8e898b766fae3dc174e546d6f737c814b4586ca0d"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..NKJlWhJEAlhVBAepa_zIT88VM-O0CUEN-RIHy5OtXkgxG84OuRfC3jDGb57DiRSh2lSdDoWwo5p2q3m4_9sfDg",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:05.485Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:05.485Z",
+          "expirationDate": "2023-10-01T18:41:05.485Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:y5T+fh73Q72C/bhv++uS0gZgsrYNYi1U/RZKBPKQzaU=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "FirstEthTxnProvider"
+          }
+        },
+        "metadata": {
+          "group": "Transactions",
+          "platform": {
+            "id": "ETH",
+            "icon": "https://passport.gitcoin.co/assets/ethereumStampIcon.svg",
+            "name": "ETH",
+            "description": "ETH possession and transaction verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "FirstEthTxnProvider",
+          "description": "First ETH transaction occurred more than 30 days ago",
+          "hash": "0xf5d84532cd4145037fb3ccf5895bf01be3151f7b6328e336999f4c474bb2842c"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9.._CfarYrwm-Mt8K1I4J7lgjfqBKgIWQi1inXXHJJGA4raJM6HIth000lSRsM4nd1hD9MX-DPlWhV3pFhxdrr6DA",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:05.063Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:05.063Z",
+          "expirationDate": "2023-10-01T18:41:05.063Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:++NSytF/ZpUrMzeBCMg+jCcqFSxaQgpe5ZSjElyqpwo=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "ethPossessionsGte#1"
+          }
+        },
+        "metadata": {
+          "group": "Possessions",
+          "platform": {
+            "id": "ETH",
+            "icon": "https://passport.gitcoin.co/assets/ethereumStampIcon.svg",
+            "name": "ETH",
+            "description": "ETH possession and transaction verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "ethPossessionsGte#1",
+          "description": "At least 1 ETH",
+          "hash": "0x829a03ea65f255c7d3f444f05a6edb9e9b5a1b1b59c2b7ff329df1e05f68f045"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..hmVzIOuIaO-71HgYBnR_clijuqu8yRHwCzQ2iinAUwg8JlPSGrij4tcmPg0Mtmkf4KfjDxTCRePrJO-Y9gTCDw",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:05.017Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:05.017Z",
+          "expirationDate": "2023-10-01T18:41:05.017Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:cqHL4zAS+SoNZeF9EakjsEeqf4R4Do7m07FotgSoSNg=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "GnosisSafe"
+          }
+        },
+        "metadata": {
+          "group": "Account Name",
+          "platform": {
+            "id": "GnosisSafe",
+            "icon": "https://passport.gitcoin.co/assets/gnosisSafeStampIcon.svg",
+            "name": "Gnosis Safe",
+            "description": "Gnosis Safe Signer/Owner Verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "GnosisSafe",
+          "description": "Encrypted",
+          "hash": "0x6190ebf51fd5de79822a58c3de8080e9dd8d8465157d8f054218eddd5042f8cc"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..RH6oYLQ7nBgrjbeczFsQwSIjNYVihKra9diGHlq9SSsMXxJAQ2MgRA4PC8-rJTSnkftf3UJAUJbw1V8K21RmDQ",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:04.723Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:04.723Z",
+          "expirationDate": "2023-10-01T18:41:04.723Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:qjJ2dw5rERr4EgB1PouUKjbOSDyPsvlf/kRiUWueaz4=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "Lens"
+          }
+        },
+        "metadata": {
+          "group": "Lens Handle",
+          "platform": {
+            "id": "Lens",
+            "icon": "https://passport.gitcoin.co/assets/lensWhiteStampIcon.svg",
+            "name": "Lens",
+            "description": "Lens Profile Verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "Lens",
+          "description": "At least 1 Lens Handle",
+          "hash": "0xc419da342463a3de054e208341b27aaef55e74a1660a45ac10cf1dae4d4964d2"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..6SigNAD0SBQMAJTTFjIeV8fOA7M46AK-1VZKSgET47_8QN10S_6sONVym3xGHOZUPLLYZxm_vIQoLchPiMFSDg",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:04.644Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:04.644Z",
+          "expirationDate": "2023-10-01T18:41:04.644Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:kd0NGm/kLHSI9Ci7BKWmeM0N/juRW77kJgYDgHi7Rkw=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "ZkSync"
+          }
+        },
+        "metadata": {
+          "group": "zkSync Lite",
+          "platform": {
+            "id": "ZkSync",
+            "icon": "https://passport.gitcoin.co/assets/zksyncStampIcon.svg",
+            "name": "ZkSync",
+            "description": "ZkSync Verification",
+            "connectMessage": "Verify Account"
+          },
+          "name": "ZkSync",
+          "description": "Transacted on zkSync Lite",
+          "hash": "0x2e760812e6696b561a918e71ad2845639638959ed846b188488dd0d8c0b953ef"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..6u4oTbUTZF5snWrw53wRl4I1qxuWy8bIs65X0c95OrGKojjy6RmwL2sw-37VrbSO8yTVGoRD9g0YlEMYelWSBA",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:04.521Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:04.521Z",
+          "expirationDate": "2023-10-01T18:41:04.521Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:eh40lBcQY1q+vrNiE6mzXJSDWTvwH/0usjGRGmg8c8I=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "SnapshotProposalsProvider"
+          }
+        },
+        "metadata": {
+          "group": "Snapshot Proposal Creator",
+          "platform": {
+            "id": "Snapshot",
+            "icon": "https://passport.gitcoin.co/assets/snapshotStampIcon.svg",
+            "name": "Snapshot",
+            "description": "Connect your existing account to verify with Snapshot.",
+            "connectMessage": "Verify Account"
+          },
+          "name": "SnapshotProposalsProvider",
+          "description": "Created a DAO proposal that was voted on by at least 1 account",
+          "hash": "0x49f4974bd25815b5deea86c2158bc9e1a18df0059c81ea14468ea8edaf7b8815"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..bWRZAM7v2XPuZ1nUwOphGi1EFxtkKdXEteqYG2dmHM74BS8QAu6fXMuBC7MlU7ue6qA6k1HPuD6Jh_4GHuFODw",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:04.469Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:04.469Z",
+          "expirationDate": "2023-10-01T18:41:04.469Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:74xeXI9qbQSVvoOHWrQVihJeCxCldhFPGKiri/S/8hs=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "SnapshotVotesProvider"
+          }
+        },
+        "metadata": {
+          "group": "Snapshot Voter",
+          "platform": {
+            "id": "Snapshot",
+            "icon": "https://passport.gitcoin.co/assets/snapshotStampIcon.svg",
+            "name": "Snapshot",
+            "description": "Connect your existing account to verify with Snapshot.",
+            "connectMessage": "Verify Account"
+          },
+          "name": "SnapshotVotesProvider",
+          "description": "Voted on 2 or more DAO proposals",
+          "hash": "0x48c72633aa8e5e893b1d4385f04fdc03b8c1cbb5daac8fd44067f404a20be08e"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..W75SGf6182hJVi_Gya6_pURtg2X9Vyq_yw883ZEzjRc0PrlH8SUuXpdEGL4krC8m-fS3HrAIcC4oSsCNxBzpDw",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:04.419Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:04.419Z",
+          "expirationDate": "2023-10-01T18:41:04.419Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:eTd+llZZoBGjbjnKUWpGJWb3CBE8+S09HwYVPGBZmkI=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "NFT"
+          }
+        },
+        "metadata": {
+          "group": "NFT Holder",
+          "platform": {
+            "id": "NFT",
+            "icon": "https://passport.gitcoin.co/assets/nftStampIcon.svg",
+            "name": "NFT Holder",
+            "description": "Connect a wallet and validate the stamp by retrieving an NFT.",
+            "connectMessage": "Connect NFT"
+          },
+          "name": "NFT",
+          "description": "Holds at least 1 NFT",
+          "hash": "0x9c4138cd0a1311e4748f70d0fe3dc55f0f5f75e0f20db731225cbc3b8914016a"
+        }
+      },
+      {
+        "version": "1.0.0",
+        "credential": {
+          "type": [
+            "VerifiableCredential"
+          ],
+          "proof": {
+            "jws": "eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..AgY7dSWZvPgnpdFVe4uvQ4g_x_2EZzc5XWqCiOBtxgNYrCIYZON4Fr3iLYdQfRLuhIOUmgriks38EFxm1tpIDA",
+            "type": "Ed25519Signature2018",
+            "created": "2023-07-03T18:41:04.229Z",
+            "proofPurpose": "assertionMethod",
+            "verificationMethod": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC#z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC"
+          },
+          "issuer": "did:key:z6MkghvGHLobLEdj1bgRLhS4LPGJAvbMA1tn2zcRyqmYU5LC",
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "issuanceDate": "2023-07-03T18:41:04.229Z",
+          "expirationDate": "2023-10-01T18:41:04.229Z",
+          "credentialSubject": {
+            "id": "did:pkh:eip155:1:0xeF8305E140ac520225DAf050e2f71d5fBcC543e7",
+            "hash": "v0.0.0:2mlkfigGYekEkwmnRhGAWxz5G6al86cGl46fZbl6vQg=",
+            "@context": [
+              {
+                "hash": "https://schema.org/Text",
+                "provider": "https://schema.org/Text"
+              }
+            ],
+            "provider": "Ens"
+          }
+        },
+        "metadata": {
+          "group": "Account Name",
+          "platform": {
+            "id": "Ens",
+            "icon": "https://passport.gitcoin.co/assets/ensStampIcon.svg",
+            "name": "ENS",
+            "description": "Purchase an .eth name to verify/ connect your existing account.",
+            "connectMessage": "Connect Account"
+          },
+          "name": "Ens",
+          "description": "Encrypted",
+          "hash": "0xb4448bd57db012361e41665a60f3906dda48b4ffc1e4b8151cb2b6d431861fae"
+        }
+      }
+    ]
+  }

@@ -7,6 +7,7 @@ import re
 import datetime 
 import openai
 from pprint import pprint
+import pickle
 
 from openai.error import RateLimitError
 import asyncio
@@ -41,6 +42,7 @@ def parse_api_response(response):
     community_achievements = generate_achievement_list([(comm["description"]) for comm in response["story"]["communityAchievements"]])
     vibe_achievements = generate_achievement_list([(vibe["description"]) for vibe in response["story"]["vibeAchievements"]])
     
+    print(nft_achievements, defi_achievements, community_achievements, vibe_achievements)
     return (
         f"The wallet {wallet_address} belongs to {ens_domain}. This wallet was "
         f"created on {creation_date} and their latest transaction was on {latest_transaction_date}.\n\n"
@@ -71,7 +73,7 @@ class ChatBot(discord.Client):
                 await message.channel.send(parse_api_response(self.api_responses[ens_domain]))
                 return
 
-            api_url = f"https://www.chainstory.xyz/api/story/getStory?walletId={ens_domain}"
+            api_url = f"https://www.chainstory.xyz/api/story/getStoryFromCache?walletId={ens_domain}"
 
             try:
                 async with aiohttp.ClientSession() as session:
@@ -85,6 +87,8 @@ class ChatBot(discord.Client):
                 if data.get('success') and data.get('story'):
                     pprint(data)
                     self.api_responses[ens_domain] = data
+                    with open('local_state.pkl', 'wb') as f:
+                        pickle.dump(self.api_responses, f)
                     await message.channel.send(parse_api_response(data))
                 else:
                     await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
@@ -121,4 +125,3 @@ if __name__ == "__main__":
     intents.message_content = True
     bot = ChatBot(intents=intents)
     bot.run(discord_token)
-    
