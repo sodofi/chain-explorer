@@ -251,7 +251,8 @@ class ChatBot(discord.Client):
                         if response.status != 200:
                             await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
                             return
-                        
+                       
+                       # test 
                         # pprint(response)
                         data = await response.json()
                         pprint(data)
