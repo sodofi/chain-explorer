@@ -120,12 +120,13 @@ def parse_passport(response):
     for item in response["items"]:
         if item['metadata']:
             name = item['metadata']['name']
+            desc = item['metadata']['description']
             pprint(name)
-            items.append(name)
+            items.append(f"* **{name}**: {desc}")
 
     return (
-        f"They own {items}"
-    )
+        f"They own:\n"
+        + "\n".join(items))
     # pprint(item["metadata"])
 
     # Get the items from the API response.
@@ -234,6 +235,17 @@ class ChatBot(discord.Client):
         if message.author == self.user:  # Ignore bot's own messages
             return
 
+        if message.content.startswith("!cache"):
+            print("CACHE: \n")
+            pprint(self.api_responses)
+            if not self.api_responses:
+                return None
+
+            addresses = list(self.api_responses.keys())
+            # TODO change address to the last key in cache
+            await message.channel.send(f'latest wallet address = {addresses[-1]}')
+            # await message.channel.send(self.api_responses[])
+
         if message.content.startswith('!score '):
             address = message.content.split(" ")[1]
             await message.channel.send(f"Fetching gitcoin passport score from {address}. This may take a moment...")
@@ -278,6 +290,7 @@ class ChatBot(discord.Client):
 
         if message.content.startswith('!passport '):
             address = message.content.split(" ")[1]
+
             await message.channel.send(f"Fetching gitcoin passport from {address}. This may take a moment...")
 
             # Check if the data for this ENS domain is already in cache
@@ -287,52 +300,34 @@ class ChatBot(discord.Client):
                 return
 
             # [TODO] replace with calling API
-            # with open('sample-passport.json')  as f:
-            #     sample_passport = json.loads(f.read())
+            with open('sample-passport.json') as f:
+                sample_passport = json.loads(f.read())
 
-            # pprint(sample_passport)
-            # # parse_passport(sample_passport)
-            # await message.channel.send(parse_passport(sample_passport))
-            # pprint(sample_passport["items"])
+            self.api_responses[address] = sample_passport
+            pprint(sample_passport)
+            # parse_passport(sample_passport)
+            await message.channel.send(parse_passport(sample_passport))
 
-            # parsed_data = parse_passport(sample_passport)
+            # GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{address}?limit=1000&include_metadata=true"
 
-            # Print the results to the console.
-            # for item in parsed_data:
-            #     print(item)
-            #     await message.channel.send(item)
+            # try:
+            #     async with aiohttp.ClientSession() as session:
+            #         async with session.get(GET_PASSPORT_STAMPS_URI, headers=passport_headers) as response:
+            #             if response.status != 200:
+            #                 await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
+            #                 return
 
-            GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{address}?limit=1000&include_metadata=true"
+            #             data = await response.json()
+            #             pprint(data)
+            #             # Check if the data is not None
+            #             if data is not None:
+            #                 await message.channel.send(f"Successfully got passport data!")
+            #                 await message.channel.send(parse_passport(data))
+            #             else:
+            #                 await message.channel.send(f"Error: Passport data is None")
 
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(GET_PASSPORT_STAMPS_URI, headers=passport_headers) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
-                            return
-
-                       # test
-                        # pprint(response)
-                        data = await response.json()
-                        pprint(data)
-                        # Check if the data is not None
-                        if data is not None:
-                            await message.channel.send(f"Successfully got passport data!")
-                            await message.channel.send(parse_passport(data))
-                        else:
-                            await message.channel.send(f"Error: Passport data is None")
-
-            #     # if data.get('success') and data.get('story'):
-            #     #     pprint(data)
-            #     #     self.api_responses[ens_domain] = data
-            #     #     with open('local_state.pkl', 'wb') as f:
-            #     #         pickle.dump(self.api_responses, f)
-            #     #     await message.channel.send(parse_api_response(data))
-            #     # else:
-            #     #     await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
-
-            except Exception as e:
-                await message.channel.send(f"Error fetching data: {str(e)}")
+            # except Exception as e:
+            #     await message.channel.send(f"Error fetching data: {str(e)}")
 
         if message.content.startswith('tell me about '):
             ens_domain = message.content.split(" ")[3]

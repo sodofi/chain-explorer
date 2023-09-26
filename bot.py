@@ -32,15 +32,7 @@ if passport_token:
 openai.api_key = openai_token
 
 
-def parse_score(response):
-    score = response["score"]
-    return (
-        f"They have a Gitcoin Passport score of: {score}"
-    )
-
-
 def parse_api_response(response):
-    pprint(response)
     wallet_address = response["story"]["walletId"]
     ens_domain = response["story"]["ensName"]
     creation_date = datetime.datetime.fromtimestamp(
@@ -51,7 +43,7 @@ def parse_api_response(response):
     passport = ""
     if response["passport"]:
         passport_score = response["passport"]["score"]
-        passport_timestamp = datetime.datetime.fromtimestamp(
+        passport_timestamp = datetime.datetime.fromisoformat(
             response["passport"]["last_score_timestamp"]).strftime("%B %d, %Y")
         passport = f"They have a Gitcoin Passport score of {passport_score} as of {passport_timestamp}"
 
@@ -108,20 +100,20 @@ class ChatBot(discord.Client):
             return
 
         if message.content.startswith("!cache"):
+            print("CACHE: \n")
             pprint(self.api_responses)
             # await message.channel.send(self.api_responses[])
 
         if message.content.startswith('tell me about '):
-            ens_domain = message.content.split(" ")[3]
-            await message.channel.send(f"Fetching on-chain data from {ens_domain}. This may take a moment...")
+            address = message.content.split(" ")[3]
+            await message.channel.send(f"Fetching on-chain data from {address}. This may take a moment...")
 
-            # Check if the data for this ENS domain is already in cache
-            if ens_domain in self.api_responses:
-                print("data ")
-                await message.channel.send(parse_api_response(self.api_responses[ens_domain]))
+            # Check if the data for this address is already in cache
+            if address in self.api_responses:
+                await message.channel.send(parse_api_response(self.api_responses[address]))
                 return
 
-            CHAINSTORY_URI = f"https://www.chainstory.xyz/api/story/getStoryFromCache?walletId={ens_domain}"
+            CHAINSTORY_URI = f"https://www.chainstory.xyz/api/story/getStoryFromCache?walletId={address}"
 
             try:
                 async with aiohttp.ClientSession() as session:
@@ -134,10 +126,11 @@ class ChatBot(discord.Client):
 
                 if data.get('success') and data.get('story'):
                     pprint(data)
-                    self.api_responses[ens_domain] = data
+                    self.api_responses[address] = data
+
                     # Retrieve more data from Gitcoin Passport
-                    address = data["story"]["walletId"]
-                    GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{address}"
+                    passport_address = data["story"]["walletId"]
+                    GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{passport_address}"
 
                     try:
                         async with aiohttp.ClientSession() as session:
@@ -145,45 +138,59 @@ class ChatBot(discord.Client):
                                 if passport_response.status == 200:
                                     passport_data = await passport_response.json()
                                     # Adding the passport score data into the nested dictionary
-                                    self.api_responses[ens_domain]['passport'] = passport_data
-                                    # await message.channel.send(f"Successfully got passport score data!")
-                                    # await message.channel.send(parse_score(passport_data))
+                                    self.api_responses[address]['passport'] = passport_data
                                 else:
                                     print(
                                         f"Error {passport_response.status}: Unable to retrieve passport score for the address.")
-                                    # await message.channel.send(f"Error {passport_response.status}: Unable to retrieve passport score for the address.")
+
                     except Exception as e:
                         await message.channel.send(f"Error fetching passport score: {str(e)}")
 
                     with open('local_state.pkl', 'wb') as f:
                         pickle.dump(self.api_responses, f)
-                    await message.channel.send(parse_api_response(data))
+                    await message.channel.send(parse_api_response(self.api_responses[address]))
                 else:
                     await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
 
             except Exception as e:
-                await message.channel.send(f"Error fetching data: {str(e)}")
+                error_msg = f"Error fetching data: {str(e)}"
+                print(error_msg)
+                await message.channel.send(error_msg)
 
-        if "nft" in message.content.lower():
-            if ens_domain in self.api_responses:
-                response = self.api_responses[ens_domain]
+        # if "nft" in message.content.lower():
+        #     if address in self.api_responses:
+        #         response = self.api_responses[address]
 
-                nft_achievements = '\n'.join(
-                    [f"• {nft['title']}: {nft['description']}" for nft in response["story"]["nftAchievements"]])
+        #         nft_achievements = '\n'.join(
+        #             [f"• {nft['title']}: {nft['description']}" for nft in response["story"]["nftAchievements"]])
 
-                output_msg = (
-                    f"They own {response['story']['numberOfNftsOwned']} NFTs including:\n{nft_achievements}"
-                )
-                await message.channel.send('test')
-                await message.channel.send(output_msg)
-            else:
-                await message.channel.send("Please provide an ENS domain first using 'tell me about' command.")
+        #         output_msg = (
+        #             f"They own {response['story']['numberOfNftsOwned']} NFTs including:\n{nft_achievements}"
+        #         )
+        #         await message.channel.send('test')
+        #         await message.channel.send(output_msg)
+        #     else:
+        #         await message.channel.send("Please provide an ENS domain first using 'tell me about' command.")
+        
+        if "passport stamps" in message.content.lower():
+            
+            with open('sample-passport.json')  as f:
+                sample_passport = json.loads(f.read())
+            # get latest cache address
+            # if self.api_response length > 0
+                # address = get the last key in self.api_response
+                # await message.channel.send(f"Fetching gitcoin passport from {address}. This may take a moment...")
+                # GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{address}?limit=1000&include_metadata=true"
+            # else 
+                # await message.channel.send(f"Send a wallet address to get information.")
+            await message.channel.send()
 
         if message.content.startswith("what is "):
             query = message.content[len("what is "):]
+            prompt = f"I want you to act as a blockchain expert. Explain {query} "
             try:
                 response = openai.Completion.create(
-                    model="text-davinci-003", prompt=query, temperature=0.6, max_tokens=200)
+                    model="text-davinci-003", prompt=prompt, temperature=0.6, max_tokens=200)
                 await message.channel.send(response.choices[0].text.strip())
             except RateLimitError:
                 await message.channel.send("Sorry, I'm getting too many requests right now. Please try again later.")
