@@ -296,7 +296,7 @@ class ChatBot(discord.Client):
             # Check if the data for this ENS domain is already in cache
             if address in self.api_responses:
                 await message.channel.send(f"{address} data in database")
-                await message.channel.send(parse_api_response(self.api_responses[address]))
+                await message.channel.send(parse_passport(self.api_responses[address]))
                 return
 
             # [TODO] replace with calling API
