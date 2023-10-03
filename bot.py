@@ -187,26 +187,43 @@ class ChatBot(discord.Client):
                 await message.channel.send(error_msg)
 
         if "passport stamps" in message.content.lower():
+            cached_addresses = list(self.api_responses.keys())
+            latest_address = {cached_addresses[-1]}
 
-            with open('sample-passport.json') as f:
-                sample_passport = json.loads(f.read())
+            # await message.channel.send(f"Fetching data from {latest_address}")
+            # Check if the data for this ENS domain is already in cache
+            if address in self.api_responses:
+                await message.channel.send(f"{latest_address} data in database")
+                # TODO: FIX
+                passport_data_chunks = parse_passport(data)
+                for chunk in passport_data_chunks:
+                    await message.channel.send(chunk)
+                # await message.channel.send(parse_passport(self.api_responses[address]))
+                return
 
-            if self.api_responses:
-                cached_addresses = list(self.api_responses.keys())
-                latest_address = {cached_addresses[-1]}
-                await message.channel.send(f"Fetching passport stamps from {latest_address}")
-                await message.channel.send(parse_passport(sample_passport))
-            else:
-                await message.channel.send(f"Send a wallet address to get information.")
+            GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{latest_address}?limit=1000&include_metadata=true"
 
-            # get latest cache address
-            # if self.api_response length > 0
-                # address = get the last key in self.api_response
-                # await message.channel.send(f"Fetching gitcoin passport from {address}. This may take a moment...")
-                # GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{address}?limit=1000&include_metadata=true"
-            # else
-                # await message.channel.send(f"Send a wallet address to get information.")
-            # await message.channel.send()
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(GET_PASSPORT_STAMPS_URI, headers=passport_headers) as response:
+                        if response.status != 200:
+                            await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
+                            return
+
+                        data = await response.json()
+                        pprint(data)
+                        # Check if the data is not None
+                        if data is not None:
+                            await message.channel.send(f"Successfully got passport data!")
+                            # await message.channel.send(parse_passport(data))
+                            passport_data_chunks = parse_passport(data)
+                            for chunk in passport_data_chunks:
+                                await message.channel.send(chunk)
+                        else:
+                            await message.channel.send(f"Error: Passport data is None")
+
+            except Exception as e:
+                await message.channel.send(f"Error fetching data: {str(e)}")
 
         if message.content.startswith("what is "):
             query = message.content[len("what is "):]
