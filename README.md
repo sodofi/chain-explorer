@@ -13,3 +13,7 @@ python3 bot.py
 Once the bot is running, you can interact with it by sending messages in a Discord channel where it is invited.
 
 # Commands
+ 
+# Next steps
+-Verify WATT balance
+-Turn Gitcoin passport into WATT
