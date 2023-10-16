@@ -29,9 +29,6 @@ if passport_token:
 # Setup OpenAI API
 openai.api_key = openai_token
 
-# TODO: create a library of api responses.
-
-
 def generate_title_list(data):
     if data:
         return '\n'.join([f"• {ach['title']}" for ach in data])
@@ -160,78 +157,14 @@ class ChatBot(discord.Client):
         self.api_responses = {}  # A dictionary to cache API responses
 
     async def on_ready(self):
-        print("Bot 2 is ready!")
+        print("Identity bot is ready!")
 
     async def on_message(self, message):
         if message.author == self.user:  # Ignore bot's own messages
             return
-
-        if message.content.startswith("!cache"):
-            print("CACHE: \n")
-            pprint(self.api_responses)
-            if not self.api_responses:
-                return None
-
-            addresses = list(self.api_responses.keys())
-            # TODO change address to the last key in cache
-            await message.channel.send(f'latest wallet address = {addresses[-1]}')
-            # await message.channel.send(self.api_responses[])
-
-            address = message.content.split(" ")[3]
-            await message.channel.send(f"Fetching on-chain data from {address}. This may take a moment...")
-
-            # Check if the data for this address is already in cache
-            if address in self.api_responses:
-                await message.channel.send(parse_api_response(self.api_responses[address]))
-                return
-
-            CHAINSTORY_URI = f"https://www.chainstory.xyz/api/story/getStoryFromCache?walletId={address}"
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(CHAINSTORY_URI) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve information for the provided ethereum address.")
-                            return
-
-                        data = await response.json()
-
-                if data.get('success') and data.get('story'):
-                    pprint(data)
-                    self.api_responses[address] = data
-
-                    # Retrieve more data from Gitcoin Passport
-                    passport_address = data["story"]["walletId"]
-                    GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{passport_address}"
-
-                    try:
-                        async with aiohttp.ClientSession() as session:
-                            async with session.get(GET_PASSPORT_SCORE_URI, headers=passport_headers) as passport_response:
-                                if passport_response.status == 200:
-                                    passport_data = await passport_response.json()
-                                    f"User {address} has a passport score"
-
-                                    # Adding the passport score data into the nested dictionary
-                                    self.api_responses[address]['passport'] = passport_data
-                                else:
-                                    self.api_responses[address]['passport'] = {
-                                    }
-                                    print(
-                                        f"Error {passport_response.status}: Unable to retrieve passport score for the address.")
-
-                    except Exception as e:
-                        await message.channel.send(f"Error fetching passport score: {str(e)}")
-
-                    # with open('local_state.pkl', 'wb') as f:
-                    #     pickle.dump(self.api_responses, f)
-                    await message.channel.send(parse_api_response(self.api_responses[address]))
-                else:
-                    await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
-
-            except Exception as e:
-                error_msg = f"Error fetching data: {str(e)}"
-                print(error_msg)
-                await message.channel.send(error_msg)
+        
+        if ("vera") in message.content.lower():
+            await message.channel.send(f"Hi, I’m Vera. I’m an AI chatbot that can understand and verify wallet-connected activity. How can I help you today?")
 
         if message.content.startswith('tell me about '):
             address = message.content.split(" ")[3]
@@ -282,6 +215,7 @@ class ChatBot(discord.Client):
                     # with open('local_state.pkl', 'wb') as f:
                     #     pickle.dump(self.api_responses, f)
                     await message.channel.send(parse_api_response(self.api_responses[address]))
+                    await message.channel.send("What else would you like to know about **foolsogood.eth**?")
                 else:
                     await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
 
@@ -289,81 +223,6 @@ class ChatBot(discord.Client):
                 error_msg = f"Error fetching data: {str(e)}"
                 print(error_msg)
                 await message.channel.send(error_msg)
-
-        if message.content.startswith('!score '):
-            address = message.content.split(" ")[1]
-            await message.channel.send(f"Fetching gitcoin passport score from {address}. This may take a moment...")
-
-            # Check if the data for this ENS domain is already in cache
-            if address in self.api_responses:
-                await message.channel.send(f"{address} data in database")
-                await message.channel.send(parse_score(self.api_responses[address]))
-                return
-
-            GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{address}"
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(GET_PASSPORT_SCORE_URI, headers=passport_headers) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve passport score for the provided address.")
-                            return
-
-                       # test
-                        # pprint(response)
-                        data = await response.json()
-                        pprint(data)
-                        # Check if the data is not None
-                        if data is not None:
-                            await message.channel.send(f"Successfully got passport score data!")
-                            await message.channel.send(parse_score(data))
-                        else:
-                            await message.channel.send(f"Error: Passport score is None")
-
-            #     # if data.get('success') and data.get('story'):
-            #     #     pprint(data)
-            #     #     self.api_responses[ens_domain] = data
-            #     #     with open('local_state.pkl', 'wb') as f:
-            #     #         pickle.dump(self.api_responses, f)
-            #     #     await message.channel.send(parse_api_response(data))
-            #     # else:
-            #     #     await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
-
-            except Exception as e:
-                await message.channel.send(f"Error fetching data: {str(e)}")
-
-        if message.content.startswith('fetch'):
-            # address = message.content.split(" ")[1]
-            address = "0x1c05decb151a459e8b045a93f472d1b238204094"
-
-            await message.channel.send(f"Fetching gitcoin passport from {address}. This may take a moment...")
-            await asyncio.sleep(3)
-            time = convert_time("2023-10-02T22:03:51.241196+00:00")
-            await message.channel.send(f"They have a score of **43.306** as of {time}")
-
-            GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{address}?limit=1000&include_metadata=true"
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(GET_PASSPORT_STAMPS_URI, headers=passport_headers) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
-                            return
-
-                        data = await response.json()
-                        pprint(data)
-                        # Check if the data is not None
-                        if data is not None:
-                            # await message.channel.send(f"Successfully got passport data!")
-                            # await message.channel.send(parse_passport(data))
-                            passport_data_chunks = parse_passport(data)
-                            for chunk in passport_data_chunks:
-                                await message.channel.send(chunk)
-                        else:
-                            await message.channel.send(f"Error: Passport data is None")
-
-            except Exception as e:
-                await message.channel.send(f"Error fetching data: {str(e)}")
 
         if message.content.startswith("explain: "):
             query = message.content[len("explain: "):]
@@ -380,29 +239,20 @@ class ChatBot(discord.Client):
         if "real human" in message.content.lower():
             await message.channel.send('One second while I look for evidence that they are human...')
             await asyncio.sleep(5)
-            await message.channel.send("Based on their Gitcoin passport, several indicators suggest that the wallet address is likely owned by a real human: \n")
+            await message.channel.send("Based on their wallet activity, several indicators suggest that the wallet address is likely owned by a real human: \n")
             await message.channel.send(
-                f"* **TrustaLabs**: This specific stamp indicates that the account has been verified as a non-Sybil account. Sybil attacks involve creating numerous fake identities to gain a disproportionate influence. Having a stamp that signifies a non-Sybil account is a significant indicator of a genuine user.\n\n"
+                f"* **TrustaLabs**: This indicates that the account has been verified as a non-Sybil account. Sybil attacks involve creating numerous fake identities to gain a disproportionate influence. Having a stamp that signifies a non-Sybil account is a significant indicator of a genuine user.\n\n"
                 f"* **CivicCaptchaPass**: This indicates that the user has passed a CAPTCHA, which is a tool designed to differentiate between humans and automated bots.\n\n"
-                f"* **Social Media Stamps**: The twitter, Facebook, and Discord stamps (even though some are encrypted) show a historical presence and engagement on these platforms. Automated bots are less likely to have established and aged social media profiles.\n\n"
-                f"* **githubAccountCreation**: Multiple stamps indicating an active GitHub account over various periods further points to a real user. GitHub, being a platform for developers, requires specific human interactions, code submissions, and other activities.\n\n"
+                f"* **Social Media Stamps on Disco**: The twitter, Facebook, and Discord stamps (even though some are encrypted) show a historical presence and engagement on these platforms. Automated bots are less likely to have established and aged social media profiles.\n\n"
+                f"* **githubAccountCreation**: Multiple Gitcoin Passport stamps indicating an active GitHub account over various periods further points to a real user. GitHub, being a platform for developers, requires specific human interactions, code submissions, and other activities.\n\n"
                 f"* **Brightid**: Even though it's encrypted, BrightID is a tool designed to verify unique human identities, reinforcing the likelihood that the account belongs to a real individual. \n\n"
                 f"* **CyberProfilePaid**: Paying for a CyberProfile Handle, especially within a specific character length, is another action typically associated with genuine users looking to establish a unique identity.\n\n"
-                f"* **Google & FacebookProfilePicture**: These further attest to a well-rounded online identity.")
-
-            # await message.channel.send(
-            #     f"* **CivicCaptchaPass**: This stamp signifies the holder has a Civic CAPTCHA Pass, which is often designed to distinguish humans from bots. \n"
-            #     f"* **FacebookProfilePicture**: The fact that a Facebook profile picture is attached suggests a human connection. While bots can be created on social platforms, the combination of this with other factors amplifies the likelihood of a real individual.\n"
-            #     f"* **TrustaLabs - TrustScan Non-Sybil Account**: This is a strong indicator. A non-Sybil account often means that the account has been verified to belong to a unique individual and is not part of a Sybil attack (where one entity creates many accounts to simulate numerous users).\n"
-            #     f"* **GuildPassportMember & GuildMember**: Being a member of various guilds, especially with multiple roles, indicates active engagement within the community. This kind of complex and social behavior is typically human.\n"
-            #     f"* **SnapshotVotesProvider**: Voting on DAO proposals indicates a level of subjective decision-making and participation that is more commonly associated with human behavior.\n"
-            #     f"* **githubAccountCreation & twitterAccountAge**: Having social media accounts, especially those that have been active over time, suggests human activity. It's more common for humans to maintain active and diverse social media profiles over extended periods.\n"
-            #     f"* **EthGasProvider**: Spending significant amounts on gas fees suggests purposeful transactions, another human trait.\n")
-
+            )
+            
         if "gitcoin community" in message.content.lower():
             await message.channel.send('One second while I look for evidence in their Gitcoin involvement...')
             await asyncio.sleep(3)
-            await message.channel.send("Based on their Gitcoin passport, the individual associated with the wallet address seems to have a significant involvement in the Gitcoin community:")
+            await message.channel.send("Based on their Gitcoin passport and other wallet activity, this user seems to have a significant involvement in the Gitcoin community:")
             await message.channel.send(
                 f"## **Grants & Contributions:**\n• **GrantsStack7Projects, GrantsStack5Projects, GrantsStack3Projects**: The user has supported a range of unique projects on Gitcoin, showing their active participation in funding the open-source ecosystem. \n\n"
                 f"• **GitcoinContributorStatistics Stamps**: These highlight the user's active contribution to the Gitcoin platform: \n    • They've contributed in at least one Gitcoin Grants round.\n    • They participated in GR14.\n    • They've made contributions worth at least $100.\n    • They've supported at least 25 unique grants."
@@ -421,7 +271,20 @@ class ChatBot(discord.Client):
             await message.channel.send(
                 f"## **Development & Code Management**: \n * **githubAccountCreation Stamps**: These show the user has had a GitHub account for quite some time. GitHub is a platform mostly used by developers, engineers, and tech enthusiasts. An active, long-standing account suggests they might have coding skills, contribute to projects, or manage technical documentation."
             )
-
+        
+        if "attestation" in message.content.lower():
+            await message.channel.send(f"How would you like to make the attestation? (Reply 1 - 4) \n 1. Disco \n 2. Sismo \n 3. Hypercert \n 4. Other")
+            
+        if "hypercert" in message.content.lower():
+            await message.channel.send('One second while I create the Hypercert attestation metadata...')
+            await asyncio.sleep(4)
+            await message.channel.send(
+                f"# **Hypercert Attestation**\n\n**Name**: Involvement in Gitcoin Ecosystem  \n\n## *Certificate of Participation*\n\n---\n\n### **Description**:\n\nRepresents dedicated participation and involvement in the Gitcoin ecosystem. Specific evidence includes: contributing to over 25 unique projects on Gitcoin, participation in GR14, and donations totaling above $100. They are also a Guild Passport Member suggesting leadership or specialist roles.\n\n"
+                f"### **Work Scope**:\n\n • Participated in GR14 \n • Contributed over $100 \n • Supported over 25 unique grants \n**Organized by**: Vera  \n**Claim Date**: 16th October 2023\n")
+            await message.channel.send(f"Would you like to mint? (Reply **yes** to mint, **edit** to edit, or **no** to start over).")
+            
+        if message.content.startswith("yes"):
+            await message.channel.send(f"Great! Creating a Hypercert. Click the link to mint: https://hypercerts.org/app/create/involvement-in-gitcoin-ecosystem")
 
 if __name__ == "__main__":
     intents = discord.Intents.default()
