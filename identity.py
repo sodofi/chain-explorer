@@ -273,18 +273,18 @@ class ChatBot(discord.Client):
             )
         
         if "attestation" in message.content.lower():
-            await message.channel.send(f"How would you like to make the attestation? (Reply 1 - 4) \n 1. Disco \n 2. Sismo \n 3. Hypercert \n 4. Other")
+            await message.channel.send(f"How would you like to make the attestation? \n\n1 - Disco \n2 - Sismo \n3 - Hypercert \n4 - Other")
             
         if "hypercert" in message.content.lower():
             await message.channel.send('One second while I create the Hypercert attestation metadata...')
             await asyncio.sleep(4)
             await message.channel.send(
-                f"# **Hypercert Attestation**\n\n**Name**: Involvement in Gitcoin Ecosystem  \n\n## *Certificate of Participation*\n\n---\n\n### **Description**:\n\nRepresents dedicated participation and involvement in the Gitcoin ecosystem. Specific evidence includes: contributing to over 25 unique projects on Gitcoin, participation in GR14, and donations totaling above $100. They are also a Guild Passport Member suggesting leadership or specialist roles.\n\n"
-                f"### **Work Scope**:\n\n • Participated in GR14 \n • Contributed over $100 \n • Supported over 25 unique grants \n**Organized by**: Vera  \n**Claim Date**: 16th October 2023\n")
+                f"# **Hypercert Attestation**\n\n**Name**: Involvement in Gitcoin Ecosystem  \n\n## *Certificate of Involvement*\n\n---\n\n### **Description**:\n\nRepresents dedicated participation and involvement in the Gitcoin ecosystem. Specific evidence includes: contributing to over 25 unique projects on Gitcoin, participation in GR14, and donations totaling above $100. They are also a Guild Passport Member suggesting leadership or specialist roles.\n\n"
+                f"### **Work Scope**:\n\n • Participated in GR14 \n • Contributed over $100 \n • Supported over 25 unique grants \n\n**Organized by**: Vera  \n\n**Claim Date**: 16th October 2023\n\n")
             await message.channel.send(f"Would you like to mint? (Reply **yes** to mint, **edit** to edit, or **no** to start over).")
             
         if message.content.startswith("yes"):
-            await message.channel.send(f"Great! Creating a Hypercert. Click the link to mint: https://hypercerts.org/app/create/involvement-in-gitcoin-ecosystem")
+            await message.channel.send(f"Great! Creating a Hypercert. Click the link here to mint: https://hypercerts.org/app/create/involvement-in-gitcoin-ecosystem")
 
 if __name__ == "__main__":
     intents = discord.Intents.default()
