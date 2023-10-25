@@ -12,7 +12,8 @@ Start the bot:
 python3 bot.py
 Once the bot is running, you can interact with it by sending messages in a Discord channel where it is invited.
 
-# Commands
+# Data Sources
+
  
 # Next steps
 -Verify WATT balance
