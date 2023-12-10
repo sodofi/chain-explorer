@@ -377,51 +377,7 @@ class ChatBot(discord.Client):
                 # Introducing a delay. Adjust as needed.
                 await asyncio.sleep(10)
 
-        if "real human" in message.content.lower():
-            await message.channel.send('One second while I look for evidence that they are human...')
-            await asyncio.sleep(5)
-            await message.channel.send("Based on their Gitcoin passport, several indicators suggest that the wallet address is likely owned by a real human: \n")
-            await message.channel.send(
-                f"* **TrustaLabs**: This specific stamp indicates that the account has been verified as a non-Sybil account. Sybil attacks involve creating numerous fake identities to gain a disproportionate influence. Having a stamp that signifies a non-Sybil account is a significant indicator of a genuine user.\n\n"
-                f"* **CivicCaptchaPass**: This indicates that the user has passed a CAPTCHA, which is a tool designed to differentiate between humans and automated bots.\n\n"
-                f"* **Social Media Stamps**: The twitter, Facebook, and Discord stamps (even though some are encrypted) show a historical presence and engagement on these platforms. Automated bots are less likely to have established and aged social media profiles.\n\n"
-                f"* **githubAccountCreation**: Multiple stamps indicating an active GitHub account over various periods further points to a real user. GitHub, being a platform for developers, requires specific human interactions, code submissions, and other activities.\n\n"
-                f"* **Brightid**: Even though it's encrypted, BrightID is a tool designed to verify unique human identities, reinforcing the likelihood that the account belongs to a real individual. \n\n"
-                f"* **CyberProfilePaid**: Paying for a CyberProfile Handle, especially within a specific character length, is another action typically associated with genuine users looking to establish a unique identity.\n\n"
-                f"* **Google & FacebookProfilePicture**: These further attest to a well-rounded online identity.")
-
-            # await message.channel.send(
-            #     f"* **CivicCaptchaPass**: This stamp signifies the holder has a Civic CAPTCHA Pass, which is often designed to distinguish humans from bots. \n"
-            #     f"* **FacebookProfilePicture**: The fact that a Facebook profile picture is attached suggests a human connection. While bots can be created on social platforms, the combination of this with other factors amplifies the likelihood of a real individual.\n"
-            #     f"* **TrustaLabs - TrustScan Non-Sybil Account**: This is a strong indicator. A non-Sybil account often means that the account has been verified to belong to a unique individual and is not part of a Sybil attack (where one entity creates many accounts to simulate numerous users).\n"
-            #     f"* **GuildPassportMember & GuildMember**: Being a member of various guilds, especially with multiple roles, indicates active engagement within the community. This kind of complex and social behavior is typically human.\n"
-            #     f"* **SnapshotVotesProvider**: Voting on DAO proposals indicates a level of subjective decision-making and participation that is more commonly associated with human behavior.\n"
-            #     f"* **githubAccountCreation & twitterAccountAge**: Having social media accounts, especially those that have been active over time, suggests human activity. It's more common for humans to maintain active and diverse social media profiles over extended periods.\n"
-            #     f"* **EthGasProvider**: Spending significant amounts on gas fees suggests purposeful transactions, another human trait.\n")
-
-        if "gitcoin community" in message.content.lower():
-            await message.channel.send('One second while I look for evidence in their Gitcoin involvement...')
-            await asyncio.sleep(3)
-            await message.channel.send("Based on their Gitcoin passport, the individual associated with the wallet address seems to have a significant involvement in the Gitcoin community:")
-            await message.channel.send(
-                f"## **Grants & Contributions:**\n• **GrantsStack7Projects, GrantsStack5Projects, GrantsStack3Projects**: The user has supported a range of unique projects on Gitcoin, showing their active participation in funding the open-source ecosystem. \n\n"
-                f"• **GitcoinContributorStatistics Stamps**: These highlight the user's active contribution to the Gitcoin platform: \n    • They've contributed in at least one Gitcoin Grants round.\n    • They participated in GR14.\n    • They've made contributions worth at least $100.\n    • They've supported at least 25 unique grants."
-            )
-            await message.channel.send(
-                f"## **Engagement & Community Involvement:**\n• **GuildMember & GuildPassportMember**: The user is deeply involved in the Gitcoin community by being a member of various guilds and holding multiple roles. This suggests a high level of engagement, possibly in leadership or specialist capacities.\n\n• **SnapshotVotesProvider**: They've been involved in the governance aspects of Gitcoin or affiliated DAOs by voting on proposals.\n\n• **Hypercerts**: Holding at least two Hypercerts for more than 15 days indicates their active involvement in events or activities that reward these certificates.")
-
-        if "technical" in message.content.lower():
-            await message.channel.send('One second while I look for evidence of technical proficiency...')
-            await asyncio.sleep(4)
-            await message.channel.send("Based on their Gitcoin passport, here's evidence of the user's technical proficiency:\n\n")
-            await asyncio.sleep(2)
-            await message.channel.send(
-                f"## **Blockchain Transactions & Engagement**:\n * **EthGasProvider, EthGTEOneTxnProvider, FirstEthTxnProvider**: These stamps indicate that the user actively transacts on the Ethereum blockchain. While transactions alone don't suggest high technical proficiency, understanding gas fees and managing multiple transactions does require some knowledge.\n * **ZkSync**:  Transacting on zkSync Lite indicates an understanding of Layer 2 scaling solutions on Ethereum. This points to a more in-depth knowledge of Ethereum's challenges and the solutions addressing them.\n\n"
-            )
-            await message.channel.send(
-                f"## **Development & Code Management**: \n * **githubAccountCreation Stamps**: These show the user has had a GitHub account for quite some time. GitHub is a platform mostly used by developers, engineers, and tech enthusiasts. An active, long-standing account suggests they might have coding skills, contribute to projects, or manage technical documentation."
-            )
-
+        
 
 if __name__ == "__main__":
     intents = discord.Intents.default()
