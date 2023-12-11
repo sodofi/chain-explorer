@@ -1,5 +1,4 @@
 import discord
-import os
 import json
 import requests
 import aiohttp
@@ -7,11 +6,13 @@ import re
 import datetime
 import openai
 from pprint import pprint
+from web3 import Web3
 import pickle
 
 from openai.error import RateLimitError
 import asyncio
 
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,37 +23,135 @@ openai_token = os.getenv('OPENAI_API_KEY')
 passport_token = os.getenv('PASSPORT_API_KEY')
 scorer_token = os.getenv('PASSPORT_SCORER')
 
+# Setup Alechmy API
+alchemy_url = "https://eth-mainnet.g.alchemy.com/v2/kyvyHty9Uu7gLaas166z5rFBPsxQDDqT"
+w3 = Web3(Web3.HTTPProvider(alchemy_url))
+
+# Setup Passport API
 if passport_token:
     passport_headers = {
         'Content-Type': 'application/json',
         'X-API-Key': passport_token
     }
 
+
+# Setup Passport context
+with open('../sample_data/stamp-metadata.json', 'r') as f:
+    stamp_metadata = json.load(f)
+
+
+def parse_passport(response):
+    items = []
+    for item in response["items"]:
+        if item['metadata']:
+            name = item['metadata']['name']
+            desc = item['metadata']['description']
+            pprint(name)
+            items.append(f"* **{name}**: {desc}")
+
+    full_message = f"## **They own the following stamps:**\n" + \
+        "\n".join(items)
+
+    # Splitting the message into 2000 characters chunks
+    return [full_message[i:i+1800] for i in range(0, len(full_message), 1800)]
+
+    # return (
+    #     f"They have the following Gitcoin Passport stamps:\n"
+    #     + "\n".join(items))
+
+def parse_passport_detailed(response):
+    items = []
+    for item in response["items"]:
+        if item['metadata']:
+            name = item['metadata']['name']
+            desc = item['metadata']['description']
+            group = item['metadata']['group']
+            pprint(name)
+            items.append(f"* ### **{name}** \n This stamp is part of the {group}. The holder of this stamp {desc}.")
+            # items.append(f"* **{name}**: {desc}")
+
+    full_message = f"## **They own the following stamps:**\n" + \
+        "\n".join(items)
+
+    # Splitting the message into 2000 characters chunks
+    return [full_message[i:i+1800] for i in range(0, len(full_message), 1800)]
+
+    # return (
+    #     f"They have the following Gitcoin Passport stamps:\n"
+    #     + "\n".join(items))
+
+# [TODO] replace this with better data that includes weights
+def analyze_stamps(user_stamps, stamp_metadata):
+    # Initialize counters for different categories of stamps
+    gitcoin_involvement = 0
+    human_likelihood = 0
+
+    # Iterate over the user's stamps
+    for stamp in user_stamps:
+        # Look up the stamp in the metadata
+        stamp_info = stamp_metadata.get(stamp['id'])
+        if not stamp_info:
+            continue
+
+        # Update counters based on the stamp's group
+        if stamp_info['group'] == 'Gitcoin':
+            gitcoin_involvement += 1
+        elif stamp_info['group'] == 'Human Verification':
+            human_likelihood += 1
+
+    # Return a summary of the user's involvement
+    return {
+        'gitcoin_involvement': gitcoin_involvement,
+        'human_likelihood': human_likelihood,
+    }
+
+
 # Setup OpenAI API
 openai.api_key = openai_token
 
-# TODO: create a library of api responses.
 
+def classify_message(message):
+    prompt = f"""
+    Analyze the following message and assign a probability score (from 0.0 to 1.0) indicating how likely it is that the message relates to each of the following categories:
+    
+    Message: "{message}"
 
-def generate_title_list(data):
-    if data:
-        return '\n'.join([f"• {ach['title']}" for ach in data])
+    Probability Scores:
+    - Humanity: [probability score]
+    - Socialness: [probability score]
+    - Gitcoin involvement: [probability score]
+    - Technical expertise: [probability score]
+    - Something else: [probability score]
+
+    Only provide the scores, without additional explanation.
+    """
+
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        temperature=0.3,
+        max_tokens=60
+    )
+    # Debug: Print raw response text
+    print("Raw Response:", response.choices[0].text)
+
+    # Extract and process the response
+    lines = response.choices[0].text.strip().split("\n")
+    categories = {}
+    for line in lines:
+        parts = line.split(":")
+        if len(parts) == 2:
+            category, score = parts[0].strip(), parts[1].strip()
+            try:
+                categories[category] = float(score)
+            except ValueError:
+                pass  # Ignore lines that do not have a valid numeric value
+
+    if categories:
+        max_category = max(categories, key=categories.get)
+        return max_category
     else:
-        return "No data found."
-
-
-def generate_description_list(data):
-    if data:
-        return '\n'.join([f"• {ach['description']}" for ach in data])
-    else:
-        return "No data found."
-
-
-def generate_info_list(data):
-    if data:
-        return '\n'.join([f"• {ach['title']} : {ach['description']}" for ach in data])
-    else:
-        return "No achievements found."
+        return "Unable to classify"
 
 
 def parse_api_response(response):
@@ -69,7 +168,7 @@ def parse_api_response(response):
         passport_score = response["passport"]["score"]
         passport_timestamp = datetime.datetime.fromisoformat(
             response["passport"]["last_score_timestamp"]).strftime("%B %d, %Y")
-        passport = f"They have a Gitcoin Passport score of **{passport_score}** as of {passport_timestamp}"
+        passport = f"They have a Gitcoin Passport score of {passport_score} as of {passport_timestamp}"
     else:
         print("no passport response")
 
@@ -105,55 +204,12 @@ def parse_api_response(response):
     return (
         f"The wallet {wallet_address} belongs to **{ens_domain}**. This wallet was "
         f"created on {creation_date} and their latest transaction was on {latest_transaction_date}.\n\n"
-        # f"They own {number_of_nfts} NFTs including:\n{nft_achievements}\n\n"
+        f"They own {number_of_nfts} NFTs including:\n{nft_achievements}\n\n"
         f"## **Evidence of their participation in DeFi and money markets**:\n{defi_achievements}\n\n"
         f"## **Evidence of participation in web3 communities**:\n{community_achievements}\n\n"
         f"## **Evidence of engagements within the web3 ecosystem**:\n{vibe_achievements}\n\n"
         f"### **{passport}**"
     )
-
-
-def convert_time(time):
-    return datetime.datetime.fromisoformat(time).strftime("%B %d, %Y")
-
-
-def parse_nft(response):
-    number_of_nfts = response["story"]["numberOfNftsOwned"]
-
-    nft_achievements = generate_info_list(response["story"]["nftAchievements"])
-
-    return (
-        f"They own {number_of_nfts} NFTs including:\n{nft_achievements}\n\n"
-    )
-
-
-def parse_score(response):
-    score = response["score"]
-    return (
-        f"They have a Gitcoin Passport score of: {score}"
-    )
-
-
-def parse_passport(response):
-
-    items = []
-    for item in response["items"]:
-        if item['metadata']:
-            name = item['metadata']['name']
-            desc = item['metadata']['description']
-            pprint(name)
-            items.append(f"* **{name}**: {desc}")
-            # items.append(f"* **{name}**")
-
-    full_message = f"## **They own the following stamps:**\n" + \
-        "\n".join(items)
-
-    # Splitting the message into 2000 characters chunks
-    return [full_message[i:i+1800] for i in range(0, len(full_message), 1800)]
-
-    # return (
-    #     f"They own:\n"
-    #     + "\n".join(items))
 
 
 class ChatBot(discord.Client):
@@ -162,7 +218,7 @@ class ChatBot(discord.Client):
         self.api_responses = {}  # A dictionary to cache API responses
 
     async def on_ready(self):
-        print("Passport bot is ready!")
+        print("Bot is ready!")
 
     async def on_message(self, message):
         if message.author == self.user:  # Ignore bot's own messages
@@ -171,19 +227,36 @@ class ChatBot(discord.Client):
         if message.content.startswith("!cache"):
             print("CACHE: \n")
             pprint(self.api_responses)
+            # If the cache is empty, return None
             if not self.api_responses:
                 return None
 
             addresses = list(self.api_responses.keys())
-            # TODO change address to the last key in cache
+            await message.channel.send(f"addresses: {addresses}")
             await message.channel.send(f'latest wallet address = {addresses[-1]}')
-            # await message.channel.send(self.api_responses[])
 
-            address = message.content.split(" ")[3]
+        if '0x' in message.content or '.eth' in message.content:
+            eth_address_pattern = re.compile(r"0x[a-fA-F0-9]{40}")
+            eth_domain_pattern = re.compile(r"\b\w+\.eth\b")
+            address = ''
+
+            if '0x' in message.content:
+                address_match = re.search(eth_address_pattern, message.content)
+                if address_match:
+                    address = address_match.group()
+                    # await message.channel.send(f"Address: {address}")
+
+            elif '.eth' in message.content:
+                domain_match = re.search(eth_domain_pattern, message.content)
+                if domain_match:
+                    address = domain_match.group()
+                    # await message.channel.send(f"Address: {address}")
+
             await message.channel.send(f"Fetching on-chain data from {address}. This may take a moment...")
 
             # Check if the data for this address is already in cache
             if address in self.api_responses:
+                await message.channel.send(f"{address} in cache")
                 await message.channel.send(parse_api_response(self.api_responses[address]))
                 return
 
@@ -193,7 +266,7 @@ class ChatBot(discord.Client):
                 async with aiohttp.ClientSession() as session:
                     async with session.get(CHAINSTORY_URI) as response:
                         if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve information for the provided ethereum address.")
+                            await message.channel.send(f"Error {response.status}: Unable to retrieve chainstory for the provided ethereum address.")
                             return
 
                         data = await response.json()
@@ -204,14 +277,15 @@ class ChatBot(discord.Client):
 
                     # Retrieve more data from Gitcoin Passport
                     passport_address = data["story"]["walletId"]
-                    GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{passport_address}"
+                    print(passport_address)
+                    GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/{scorer_token}/{passport_address}"
 
                     try:
                         async with aiohttp.ClientSession() as session:
                             async with session.get(GET_PASSPORT_SCORE_URI, headers=passport_headers) as passport_response:
                                 if passport_response.status == 200:
                                     passport_data = await passport_response.json()
-                                    f"User {address} has a passport score"
+                                    # await message.channel.send(f"User {address} has a Gitcoin Passport")
 
                                     # Adding the passport score data into the nested dictionary
                                     self.api_responses[address]['passport'] = passport_data
@@ -220,6 +294,7 @@ class ChatBot(discord.Client):
                                     }
                                     print(
                                         f"Error {passport_response.status}: Unable to retrieve passport score for the address.")
+                                    await message.channel.send(f"User {address} does not have a Gitcoin Passport")
 
                     except Exception as e:
                         await message.channel.send(f"Error fetching passport score: {str(e)}")
@@ -228,122 +303,24 @@ class ChatBot(discord.Client):
                     #     pickle.dump(self.api_responses, f)
                     await message.channel.send(parse_api_response(self.api_responses[address]))
                 else:
-                    await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
+                    await message.channel.send("Unable to retrieve chain information for the provided wallet address.")
 
             except Exception as e:
                 error_msg = f"Error fetching data: {str(e)}"
                 print(error_msg)
                 await message.channel.send(error_msg)
 
-        if message.content.startswith('tell me about '):
-            address = message.content.split(" ")[3]
-            await message.channel.send(f"Fetching on-chain data from {address}. This may take a moment...")
+        # passport stamps prompt
+        if message.content.startswith("!passport stamps"):
+            if not self.api_responses:
+                return None
 
-            # Check if the data for this address is already in cache
-            if address in self.api_responses:
-                await message.channel.send(parse_api_response(self.api_responses[address]))
-                return
+            cached_addresses = list(self.api_responses.keys())
+            latest_address = cached_addresses[-1]
+            address = self.api_responses[latest_address]['story']['walletId']
+            await message.channel.send(address)
 
-            CHAINSTORY_URI = f"https://www.chainstory.xyz/api/story/getStoryFromCache?walletId={address}"
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(CHAINSTORY_URI) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve information for the provided ethereum address.")
-                            return
-
-                        data = await response.json()
-
-                if data.get('success') and data.get('story'):
-                    pprint(data)
-                    self.api_responses[address] = data
-
-                    # Retrieve more data from Gitcoin Passport
-                    passport_address = data["story"]["walletId"]
-                    GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{passport_address}"
-
-                    try:
-                        async with aiohttp.ClientSession() as session:
-                            async with session.get(GET_PASSPORT_SCORE_URI, headers=passport_headers) as passport_response:
-                                if passport_response.status == 200:
-                                    passport_data = await passport_response.json()
-                                    f"User {address} has a passport score"
-
-                                    # Adding the passport score data into the nested dictionary
-                                    self.api_responses[address]['passport'] = passport_data
-                                else:
-                                    self.api_responses[address]['passport'] = {
-                                    }
-                                    print(
-                                        f"Error {passport_response.status}: Unable to retrieve passport score for the address.")
-
-                    except Exception as e:
-                        await message.channel.send(f"Error fetching passport score: {str(e)}")
-
-                    # with open('local_state.pkl', 'wb') as f:
-                    #     pickle.dump(self.api_responses, f)
-                    await message.channel.send(parse_api_response(self.api_responses[address]))
-                else:
-                    await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
-
-            except Exception as e:
-                error_msg = f"Error fetching data: {str(e)}"
-                print(error_msg)
-                await message.channel.send(error_msg)
-
-        if message.content.startswith('!score '):
-            address = message.content.split(" ")[1]
-            await message.channel.send(f"Fetching gitcoin passport score from {address}. This may take a moment...")
-
-            # Check if the data for this ENS domain is already in cache
-            if address in self.api_responses:
-                await message.channel.send(f"{address} data in database")
-                await message.channel.send(parse_score(self.api_responses[address]))
-                return
-
-            GET_PASSPORT_SCORE_URI = f"https://api.scorer.gitcoin.co/registry/v2/score/698/{address}"
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(GET_PASSPORT_SCORE_URI, headers=passport_headers) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve passport score for the provided address.")
-                            return
-
-                       # test
-                        # pprint(response)
-                        data = await response.json()
-                        pprint(data)
-                        # Check if the data is not None
-                        if data is not None:
-                            await message.channel.send(f"Successfully got passport score data!")
-                            await message.channel.send(parse_score(data))
-                        else:
-                            await message.channel.send(f"Error: Passport score is None")
-
-            #     # if data.get('success') and data.get('story'):
-            #     #     pprint(data)
-            #     #     self.api_responses[ens_domain] = data
-            #     #     with open('local_state.pkl', 'wb') as f:
-            #     #         pickle.dump(self.api_responses, f)
-            #     #     await message.channel.send(parse_api_response(data))
-            #     # else:
-            #     #     await message.channel.send("Unable to retrieve chain history for the provided ENS domain.")
-
-            except Exception as e:
-                await message.channel.send(f"Error fetching data: {str(e)}")
-
-        if message.content.startswith('fetch'):
-            # address = message.content.split(" ")[1]
-            address = "0x1c05decb151a459e8b045a93f472d1b238204094"
-
-            await message.channel.send(f"Fetching gitcoin passport from {address}. This may take a moment...")
-            await asyncio.sleep(3)
-            time = convert_time("2023-10-02T22:03:51.241196+00:00")
-            await message.channel.send(f"They have a score of **43.306** as of {time}")
-
-            GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{address}?limit=1000&include_metadata=true"
+            GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/stamps/{address}?limit=1000&include_metadata=true"
 
             try:
                 async with aiohttp.ClientSession() as session:
@@ -356,9 +333,9 @@ class ChatBot(discord.Client):
                         pprint(data)
                         # Check if the data is not None
                         if data is not None:
-                            # await message.channel.send(f"Successfully got passport data!")
-                            # await message.channel.send(parse_passport(data))
-                            passport_data_chunks = parse_passport(data)
+                            await message.channel.send(f"Successfully got passport data!")
+
+                            passport_data_chunks = parse_passport_detailed(data)
                             for chunk in passport_data_chunks:
                                 await message.channel.send(chunk)
                         else:
@@ -367,9 +344,21 @@ class ChatBot(discord.Client):
             except Exception as e:
                 await message.channel.send(f"Error fetching data: {str(e)}")
 
-        if message.content.startswith("explain: "):
-            query = message.content[len("explain: "):]
-            prompt = f"I want you to act as a blockchain expert who works at Gitcoin. Gitcoin has been building tools that enable communities to build, fund and protect what matters to them. One of their tools is Gitcoin Passport is an identity verification application and Sybil resistance protocol. It enables users to collect verifiable credentials, or Stamps, that prove their identity and trustworthiness without exposing personally identifying information. Apps and organizations can then utilize Passport to protect their community and projects from sybil attacks and other bad actors. Explain in one clear and concise sentence {query} "
+        # alchemy prompt
+        if message.content.startswith("!alchemy"):
+            if not self.api_responses:
+                return None
+
+            cached_addresses = list(self.api_responses.keys())
+            latest_address = cached_addresses[-1]
+            address = self.api_responses[latest_address]['story']['walletId']
+            # print("is connected? " + w3.is_connected())
+            await message.channel.send(f"is connected? " + str(w3.is_connected()))
+            await message.channel.send(f"ETH balance: " + str(w3.eth.get_balance(address)))
+
+        if message.content.startswith("!explain "):
+            query = message.content[len("!explain "):]
+            prompt = f"As an expert in Gitcoin Passport, your role is to provide detailed information and insights about the Gitcoin Passport application, its purpose, and its use, particularly focusing on the various stamps it offers. Gitcoin Passport is a vital identity verification application and Sybil resistance protocol, designed to enhance the security and integrity of digital communities and projects. Your responses should be informed, precise, and helpful to users seeking to understand how Gitcoin Passport works, especially in regards to its verifiable credentials or Stamps. Explain in one clear and concise sentence  {query} "
             try:
                 response = openai.Completion.create(
                     model="text-davinci-003", prompt=prompt, temperature=0.6, max_tokens=200)
@@ -379,7 +368,25 @@ class ChatBot(discord.Client):
                 # Introducing a delay. Adjust as needed.
                 await asyncio.sleep(10)
 
-        
+        if message.content.startswith("!ask "):
+            query = message.content[len("!ask "):]
+            category = classify_message(query)
+            await message.channel.send(f"Classified as: " + category)
+            if category == "Humanity":
+                #get all humanity stamps and print
+                await message.channel.send(category)
+                return
+            elif category == "Gitcoin involvement":
+                await message.channel.send(category)
+                return
+            elif category == "Technical expertise":
+                await message.channel.send(category)
+                return
+            else:
+                await message.channel.send(category)
+                return
+
+
 
 if __name__ == "__main__":
     intents = discord.Intents.default()

@@ -6,6 +6,7 @@ import re
 import datetime
 import openai
 from pprint import pprint
+from web3 import Web3
 import pickle
 
 from openai.error import RateLimitError
@@ -31,6 +32,11 @@ if passport_token:
 
 # Setup OpenAI API
 openai.api_key = openai_token
+
+# Setup Alechmy API
+alchemy_url = "https://eth-mainnet.g.alchemy.com/v2/kyvyHty9Uu7gLaas166z5rFBPsxQDDqT"
+w3 = Web3(Web3.HTTPProvider(alchemy_url))
+
 
 def parse_api_response(response):
     wallet_address = response["story"]["walletId"]
@@ -124,6 +130,7 @@ class ChatBot(discord.Client):
         if message.content.startswith("!cache"):
             print("CACHE: \n")
             pprint(self.api_responses)
+            # If the cache is empty, return None
             if not self.api_responses:
                 return None
 
@@ -207,11 +214,13 @@ class ChatBot(discord.Client):
                 print(error_msg)
                 await message.channel.send(error_msg)
 
-        if "passport stamps" in message.content.lower():
+        # passport stamps prompt
+        if message.content.startswith("!passport stamps"):
+            if not self.api_responses:
+                return None
+            
             cached_addresses = list(self.api_responses.keys())
-            print(cached_addresses)
             latest_address = cached_addresses[-1]
-            print(latest_address)
             address = self.api_responses[latest_address]['story']['walletId']
             await message.channel.send(address)
 
@@ -239,8 +248,21 @@ class ChatBot(discord.Client):
             except Exception as e:
                 await message.channel.send(f"Error fetching data: {str(e)}")
 
-        if message.content.startswith("what is "):
-            query = message.content[len("what is "):]
+        # alchemy prompt
+        if message.content.startswith("!alchemy"):
+            if not self.api_responses:
+                return None
+            
+            cached_addresses = list(self.api_responses.keys())
+            latest_address = cached_addresses[-1]
+            address = self.api_responses[latest_address]['story']['walletId']
+            # print("is connected? " + w3.is_connected())
+            await message.channel.send(f"is connected? " + str(w3.is_connected()))
+            await message.channel.send(f"ETH balance: " + str(w3.eth.get_balance(address)))
+
+
+        if message.content.startswith("!explain "):
+            query = message.content[len("!explain "):]
             prompt = f"I want you to act as a blockchain expert. Explain {query} "
             try:
                 response = openai.Completion.create(
