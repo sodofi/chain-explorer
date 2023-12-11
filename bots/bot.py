@@ -32,7 +32,6 @@ if passport_token:
 # Setup OpenAI API
 openai.api_key = openai_token
 
-
 def parse_api_response(response):
     wallet_address = response["story"]["walletId"]
     ens_domain = response["story"]["ensName"]
@@ -81,15 +80,14 @@ def parse_api_response(response):
         response["story"]["vibeAchievements"])
 
     return (
-        f"The wallet {wallet_address} belongs to {ens_domain}. This wallet was "
-        f"created on {creation_date} and their latest transaction was on {latest_transaction_date}.\n\n"
-        f"They own {number_of_nfts} NFTs including:\n{nft_achievements}\n\n"
-        f"Evidence of their participation in DeFi and money markets:\n{defi_achievements}\n\n"
-        f"Evidence of participation in web3 communities:\n{community_achievements}\n\n"
-        f"Evidence of engagements within the web3 ecosystem:\n{vibe_achievements}\n\n"
-        f"{passport}"
-    )
-
+            f"The wallet {wallet_address} belongs to **{ens_domain}**. This wallet was "
+            f"created on {creation_date} and their latest transaction was on {latest_transaction_date}.\n\n"
+            f"They own {number_of_nfts} NFTs including:\n{nft_achievements}\n\n"
+            f"## **Evidence of their participation in DeFi and money markets**:\n{defi_achievements}\n\n"
+            f"## **Evidence of participation in web3 communities**:\n{community_achievements}\n\n"
+            f"## **Evidence of engagements within the web3 ecosystem**:\n{vibe_achievements}\n\n"
+            f"### **{passport}**"
+        )
 
 def parse_passport(response):
     items = []
@@ -100,9 +98,15 @@ def parse_passport(response):
             pprint(name)
             items.append(f"* **{name}**: {desc}")
 
-    return (
-        f"They have the following Gitcoin Passport stamps:\n"
-        + "\n".join(items))
+    full_message = f"## **They own the following stamps:**\n" + \
+    "\n".join(items)
+
+    # Splitting the message into 2000 characters chunks
+    return [full_message[i:i+1800] for i in range(0, len(full_message), 1800)]
+
+    # return (
+    #     f"They have the following Gitcoin Passport stamps:\n"
+    #     + "\n".join(items))
 
 
 class ChatBot(discord.Client):
@@ -124,11 +128,9 @@ class ChatBot(discord.Client):
                 return None
 
             addresses = list(self.api_responses.keys())
-            # TODO change address to the last key in cache
             await message.channel.send(f"addresses: {addresses}")
             await message.channel.send(f'latest wallet address = {addresses[-1]}')
 
-            # await message.channel.send(self.api_responses[])
 
         if '0x' in message.content or '.eth' in message.content:
             eth_address_pattern = re.compile(r"0x[a-fA-F0-9]{40}")
@@ -146,8 +148,6 @@ class ChatBot(discord.Client):
                 if domain_match:
                     address = domain_match.group()
                     # await message.channel.send(f"Address: {address}")
-
-            # await message.channel.send(f"the users address is: {address}")
 
             await message.channel.send(f"Fetching on-chain data from {address}. This may take a moment...")
 
@@ -215,20 +215,6 @@ class ChatBot(discord.Client):
             address = self.api_responses[latest_address]['story']['walletId']
             await message.channel.send(address)
 
-            # await message.channel.send({latest_address})
-
-            # await message.channel.send(f"Fetching data from {latest_address}")
-            # Check if the data for this ENS domain is already in cache
-            # if address in self.api_responses:
-            #     await message.channel.send(f"{latest_address} data in database")
-            #     # TODO: FIX
-            #     passport_data_chunks = parse_passport(data)
-            #     for chunk in passport_data_chunks:
-            #         await message.channel.send(chunk)
-            #     # await message.channel.send(parse_passport(self.api_responses[address]))
-            #     return
-
-            # GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/v2/stamps/{latest_address}?limit=1000&include_metadata=true"
             GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/stamps/{address}?limit=1000&include_metadata=true"
 
             try:
@@ -243,12 +229,10 @@ class ChatBot(discord.Client):
                         # Check if the data is not None
                         if data is not None:
                             await message.channel.send(f"Successfully got passport data!")
-                            await message.channel.send(parse_passport(data))
 
-                            # await message.channel.send(parse_passport(data))
-                            # passport_data_chunks = parse_passport(data)
-                            # for chunk in passport_data_chunks:
-                            #     await message.channel.send(chunk)
+                            passport_data_chunks = parse_passport(data)
+                            for chunk in passport_data_chunks:
+                                await message.channel.send(chunk)
                         else:
                             await message.channel.send(f"Error: Passport data is None")
 
