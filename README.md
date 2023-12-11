@@ -30,12 +30,16 @@ Please replace `"your-discord-token"`, `"your-openai-token"`, `"your-passport-to
 ### Running the Bot
 
 To run the basic bot, use the following command:
+```
 cd bots
 python3 bot.py
+```
 
 To run the Gitcoin Passport bot, use the following command:
+```
 cd bots
 python3 passport.py
+```
 
 Once the bot is running, you can interact with it by sending messages in a Discord channel where it is invited.
 
@@ -64,10 +68,10 @@ Please note that the bot's responses depend on the data it fetches from the APIs
 Please use the bot as intended.
 
 ### Data Sources API
-alchemy
-chainstory
-gitcoin passport
-disco
+- alchemy
+- chainstory
+- gitcoin passport
+- disco
 
 ## Contributing:
 We welcome contributions from the community! If you'd like to contribute to the Chain Explorer project, please follow these steps:
@@ -81,9 +85,9 @@ We welcome contributions from the community! If you'd like to contribute to the 
 
 Once your pull request is submitted, it will be reviewed by the project maintainers. Thank you for contributing to Chain Explorer!
  
-### Looking for contributors for the following
--Add more data sources
--Improve prompt engineering
--Improve classification abilities
--Improve data
--Optimize prompt length based off of relevant data
+### Looking for contributors for the following:
+- Add more data sources
+- Improve prompt engineering
+- Improve classification abilities
+- Improve data
+- Optimize prompt length based off of relevant data
