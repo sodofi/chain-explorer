@@ -79,9 +79,10 @@ We welcome contributions from the community! If you'd like to contribute to the 
 1. Fork the repository on GitHub.
 2. Clone your forked repository to your local machine.
 3. Create a new branch for your changes.
-4. Make your changes and commit them to your branch.
-5. Push your branch to your fork on GitHub.
-6. Open a pull request from your forked repository's branch to the main repository's `main` branch.
+4. Make a new bot in the bots folder. Can copy/paste code from an existing bot.
+5. Make your changes and commit them to your branch.
+6. Push your branch to your fork on GitHub.
+7. Open a pull request from your forked repository's branch to the main repository's `main` branch.
 
 Once your pull request is submitted, it will be reviewed by the project maintainers. Thank you for contributing to Chain Explorer!
  
