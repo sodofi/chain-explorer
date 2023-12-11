@@ -22,61 +22,69 @@ pip3 install discord.js fs axios ethers openai pprint
 pip3 install discord.js fs axios ethers openai pprint
 ```
 
-### tokens.json
+### .env
 
-You need to create a `tokens.json` file in the main folder. This file should contain your private tokens for Discord, OpenAI, and other services. The file should look something like this:
-```
-{
-"discord": "your-discord-token",
-"openai": "your-openai-token",
-"passport": "your-passport-token",
-"scorer": "your-scorer-token"
-}
-```
-
+You need to create a `.env` file in the root directory. Use .env.sample as an example. Please contact owner for Discord token. Use your own OpenAI and Passport keys.
 
 Please replace `"your-discord-token"`, `"your-openai-token"`, `"your-passport-token"`, and `"your-scorer-token"` with your actual tokens.
 
 ### Running the Bot
 
-To run the bot, use the following command:
+To run the basic bot, use the following command:
+cd bots
 python3 bot.py
 
+To run the Gitcoin Passport bot, use the following command:
+cd bots
+python3 passport.py
 
 Once the bot is running, you can interact with it by sending messages in a Discord channel where it is invited.
 
+The Discord bot is already invited to the following server: https://discord.gg/HDKjS4DY
+
+Please contact the owner if you'd like to get added permissions for testing.
+
 ### Example Prompts
 
-Here are some example prompts you can use to test the bot:
+Here are some example prompts you can use to test the basic bot:
 
-- [hi dora](file:///Users/sophiadew/CODE/chain-explorer/demo.py#215%2C40-215%2C40): The bot will respond with a greeting.
-- `tell me about 0x123...`: Replace `0x123...` with an Ethereum address. The bot will fetch on-chain data related to the address.
-- [passport stamps](file:///Users/sophiadew/CODE/chain-explorer/demo.py#288%2C13-288%2C13): The bot will fetch passport stamps from the latest cached address.
+- any ethereum wallet address that starts with 0x or ends with .eth: The bot will retrieve a summary for the following address
+- !cache : The bot will return list of addresses in cache
+- !passport stamps : A summary of the passport stamps from the latest address in cache
+- !alchemy : Alchemy data from the latest address in cache
+- !explain {prompt}: Uses openai API to answer {prompt}
+
+Here are some example prompts you can use to test the passport bot:
+- any ethereum wallet address that starts with 0x or ends with .eth: The bot will retrieve a summary for the following address
+- !cache : The bot will return list of addresses in cache
+- !passport stamps : A summary of the passport stamps from the latest address in cache
+- !ask {question} : Will clasify the question into a certain category and develop a prompt with relevant passport data
 
 Please note that the bot's responses depend on the data it fetches from the APIs it interacts with.
 
-# Data Sources API
+Please use the bot as intended.
+
+### Data Sources API
 alchemy
 chainstory
 gitcoin passport
 disco
+
+## Contributing:
+We welcome contributions from the community! If you'd like to contribute to the Chain Explorer project, please follow these steps:
+
+1. Fork the repository on GitHub.
+2. Clone your forked repository to your local machine.
+3. Create a new branch for your changes.
+4. Make your changes and commit them to your branch.
+5. Push your branch to your fork on GitHub.
+6. Open a pull request from your forked repository's branch to the main repository's `main` branch.
+
+Once your pull request is submitted, it will be reviewed by the project maintainers. Thank you for contributing to Chain Explorer!
  
-# Next steps
--Verify WATT balance
--Turn Gitcoin passport into WATT
-
-# Passport
-python3 passport.py
-
-# Chain Explorer
-Install the required dependencies:
-pip3 install discord
-Clone this repository:
-git clone https://github.com/sodew/chain-explorer
-Navigate to the repository directory:
-cd chain-explorer
-Start the bot:
-python3 bot.py
-Once the bot is running, you can interact with it by sending messages in a Discord channel where it is invited.
-
-
+### Looking for contributors for the following
+-Add more data sources
+-Improve prompt engineering
+-Improve classification abilities
+-Improve data
+-Optimize prompt length based off of relevant data
