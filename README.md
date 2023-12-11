@@ -13,13 +13,12 @@ To run the bot locally, you need to install the following dependencies:
 - axios
 - ethers
 - openai
-- pprint
 
 You can install these dependencies using pip for Python packages and npm for JavaScript packages. Here's an example of how to install them:
 ```python```
-pip3 install discord.js fs axios ethers openai pprint
+pip3 install discord.js fs axios ethers openai
 ```python
-pip3 install discord.js fs axios ethers openai pprint
+pip3 install discord.js fs axios ethers openai
 ```
 
 ### .env
