@@ -59,6 +59,7 @@ def parse_passport(response):
     #     f"They have the following Gitcoin Passport stamps:\n"
     #     + "\n".join(items))
 
+
 def parse_passport_detailed(response):
     items = []
     for item in response["items"]:
@@ -67,7 +68,8 @@ def parse_passport_detailed(response):
             desc = item['metadata']['description']
             group = item['metadata']['group']
             pprint(name)
-            items.append(f"* ### **{name}** \n This stamp is part of the {group}. The holder of this stamp {desc}.")
+            items.append(
+                f"### **{name}** \nThis stamp is part of the {group}. The holder of this stamp {desc}.")
             # items.append(f"* **{name}**: {desc}")
 
     full_message = f"## **They own the following stamps:**\n" + \
@@ -76,11 +78,29 @@ def parse_passport_detailed(response):
     # Splitting the message into 2000 characters chunks
     return [full_message[i:i+1800] for i in range(0, len(full_message), 1800)]
 
-    # return (
-    #     f"They have the following Gitcoin Passport stamps:\n"
-    #     + "\n".join(items))
+
+def parse_passport_groups(response, target_groups, category):
+    items = []
+    for item in response["items"]:
+        if item['metadata']:
+            group = item['metadata']['group']
+            # Only process items belonging to any of the target groups
+            if group in target_groups:
+                name = item['metadata']['name']
+                desc = item['metadata']['description']
+                pprint(name)
+                items.append(
+                    f"* ### **{name}** \nThe holder of this stamp {desc}.")
+
+    full_message = f"## **They own the following stamps in the {category} category:**\n" + \
+        "\n".join(items)
+
+    # Splitting the message into 2000 characters chunks
+    return [full_message[i:i+1800] for i in range(0, len(full_message), 1800)]
 
 # [TODO] replace this with better data that includes weights
+
+
 def analyze_stamps(user_stamps, stamp_metadata):
     # Initialize counters for different categories of stamps
     gitcoin_involvement = 0
@@ -319,6 +339,10 @@ class ChatBot(discord.Client):
             latest_address = cached_addresses[-1]
             address = self.api_responses[latest_address]['story']['walletId']
             await message.channel.send(address)
+            pprint(self.api_responses[latest_address])
+
+            # if 'passport' in self.api_responses[latest_address] and self.api_responses[latest_address]['passport']:
+            #     [TODO] add passport stamps to cache so you don't have to call API again
 
             GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/stamps/{address}?limit=1000&include_metadata=true"
 
@@ -335,7 +359,8 @@ class ChatBot(discord.Client):
                         if data is not None:
                             await message.channel.send(f"Successfully got passport data!")
 
-                            passport_data_chunks = parse_passport_detailed(data)
+                            passport_data_chunks = parse_passport_detailed(
+                                data)
                             for chunk in passport_data_chunks:
                                 await message.channel.send(chunk)
                         else:
@@ -368,12 +393,27 @@ class ChatBot(discord.Client):
                 # Introducing a delay. Adjust as needed.
                 await asyncio.sleep(10)
 
+        if message.content.startswith("!test "):
+            if not self.api_responses:
+                return None
+
+            cached_addresses = list(self.api_responses.keys())
+            latest_address = cached_addresses[-1]
+            address = self.api_responses[latest_address]['story']['walletId']
+            await message.channel.send(address)
+
+            if self.api_responses[address]['passport']:
+                passport_data_chunks = parse_passport_detailed(data)
+                for chunk in passport_data_chunks:
+                    await message.channel.send(chunk)
+                return
+
         if message.content.startswith("!ask "):
             query = message.content[len("!ask "):]
             category = classify_message(query)
             await message.channel.send(f"Classified as: " + category)
             if category == "Humanity":
-                #get all humanity stamps and print
+                # get all humanity stamps and print
                 await message.channel.send(category)
                 return
             elif category == "Gitcoin involvement":
@@ -385,7 +425,6 @@ class ChatBot(discord.Client):
             else:
                 await message.channel.send(category)
                 return
-
 
 
 if __name__ == "__main__":
