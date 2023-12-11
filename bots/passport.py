@@ -83,14 +83,17 @@ def parse_passport_groups(response, target_groups, category):
     items = []
     for item in response["items"]:
         if item['metadata']:
+            name = item['metadata']['name']
+            desc = item['metadata']['description']
+            task = item['metadata']['platform']['description']
             group = item['metadata']['group']
             # Only process items belonging to any of the target groups
             if group in target_groups:
-                name = item['metadata']['name']
-                desc = item['metadata']['description']
+                # name = item['metadata']['name']
+                # desc = item['metadata']['description']
                 pprint(name)
                 items.append(
-                    f"* ### **{name}** \nThe holder of this stamp {desc}.")
+                    f"### **{name}** \nThe holder of this stamp {desc}. To get this stamp, they had to {task}")
 
     full_message = f"## **They own the following stamps in the {category} category:**\n" + \
         "\n".join(items)
@@ -137,11 +140,11 @@ def classify_message(message):
     Message: "{message}"
 
     Probability Scores:
-    - Humanity: [probability score]
-    - Socialness: [probability score]
-    - Gitcoin involvement: [probability score]
-    - Technical expertise: [probability score]
-    - Something else: [probability score]
+    Humanity: [probability score]
+    Socialness: [probability score]
+    Gitcoin involvement: [probability score]
+    Technical expertise: [probability score]
+    Something else: [probability score]
 
     Only provide the scores, without additional explanation.
     """
@@ -249,6 +252,7 @@ class ChatBot(discord.Client):
             pprint(self.api_responses)
             # If the cache is empty, return None
             if not self.api_responses:
+                await message.channel.send("Please input a wallet addresss to analyze. Then ask again.")
                 return None
 
             addresses = list(self.api_responses.keys())
@@ -333,6 +337,7 @@ class ChatBot(discord.Client):
         # passport stamps prompt
         if message.content.startswith("!passport stamps"):
             if not self.api_responses:
+                await message.channel.send("Please input a wallet addresss to analyze. Then ask again.")
                 return None
 
             cached_addresses = list(self.api_responses.keys())
@@ -341,37 +346,53 @@ class ChatBot(discord.Client):
             await message.channel.send(address)
             pprint(self.api_responses[latest_address])
 
-            # if 'passport' in self.api_responses[latest_address] and self.api_responses[latest_address]['passport']:
-            #     [TODO] add passport stamps to cache so you don't have to call API again
+            if 'passportStamps' in self.api_responses[latest_address] and self.api_responses[latest_address]['passportStamps']:
+                await message.channel.send('passport stamps in cache')
+                data = self.api_responses[latest_address]['passportStamps']
+                # Check if the data is not None
+                if data is not None:
+                    await message.channel.send(f"Successfully got passport data!")
 
-            GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/stamps/{address}?limit=1000&include_metadata=true"
+                    passport_data_chunks = parse_passport_detailed(data)
+                    for chunk in passport_data_chunks:
+                        await message.channel.send(chunk)
 
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(GET_PASSPORT_STAMPS_URI, headers=passport_headers) as response:
-                        if response.status != 200:
-                            await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
-                            return
+                    self.api_responses[latest_address]['passportStamps'] = data
+                else:
+                    await message.channel.send(f"Error: Passport data is None")
 
-                        data = await response.json()
-                        pprint(data)
-                        # Check if the data is not None
-                        if data is not None:
-                            await message.channel.send(f"Successfully got passport data!")
+            else:
+                GET_PASSPORT_STAMPS_URI = f"https://api.scorer.gitcoin.co/registry/stamps/{address}?limit=1000&include_metadata=true"
 
-                            passport_data_chunks = parse_passport_detailed(
-                                data)
-                            for chunk in passport_data_chunks:
-                                await message.channel.send(chunk)
-                        else:
-                            await message.channel.send(f"Error: Passport data is None")
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(GET_PASSPORT_STAMPS_URI, headers=passport_headers) as response:
+                            if response.status != 200:
+                                await message.channel.send(f"Error {response.status}: Unable to retrieve passport for the provided address.")
+                                return
 
-            except Exception as e:
-                await message.channel.send(f"Error fetching data: {str(e)}")
+                            data = await response.json()
+                            pprint(data)
+                            # Check if the data is not None
+                            if data is not None:
+                                await message.channel.send(f"Successfully got passport data!")
+
+                                passport_data_chunks = parse_passport_detailed(
+                                    data)
+                                for chunk in passport_data_chunks:
+                                    await message.channel.send(chunk)
+
+                                self.api_responses[latest_address]['passportStamps'] = data
+                            else:
+                                await message.channel.send(f"Error: Passport data is None")
+
+                except Exception as e:
+                    await message.channel.send(f"Error fetching data: {str(e)}")
 
         # alchemy prompt
         if message.content.startswith("!alchemy"):
             if not self.api_responses:
+                await message.channel.send("Please input a wallet addresss to analyze. Then ask again.")
                 return None
 
             cached_addresses = list(self.api_responses.keys())
@@ -395,35 +416,155 @@ class ChatBot(discord.Client):
 
         if message.content.startswith("!test "):
             if not self.api_responses:
+                await message.channel.send("Please input a wallet addresss to analyze. Then ask again.")
                 return None
 
             cached_addresses = list(self.api_responses.keys())
             latest_address = cached_addresses[-1]
-            address = self.api_responses[latest_address]['story']['walletId']
-            await message.channel.send(address)
+            await message.channel.send(latest_address)
 
-            if self.api_responses[address]['passport']:
-                passport_data_chunks = parse_passport_detailed(data)
+            passportStamps = {}
+            if 'passportStamps' in self.api_responses[latest_address]:
+                passportStamps = self.api_responses[latest_address]['passportStamps']
+
+            passport = {}
+            if 'passport' in self.api_responses[latest_address]:
+                passport = self.api_responses[latest_address]['passport']
+
+            
+            if passport is not None:
+                print(passport['score'])
+                await message.channel.send(passport['score'])
+            else:
+                await message.channe.send('passport is none')
+
+            if passportStamps is not None:
+                await message.channel.send(f"Successfully got passport data!")
+                target_groups = ["Account Name",  "Account Creation", "Government ID", "CAPTCHA Pass", "Uniqueness Pass", "Liveness Pass"]
+                category = 'Humanity'
+                passport_data_chunks = parse_passport_groups(
+                    passportStamps, target_groups, category)
                 for chunk in passport_data_chunks:
                     await message.channel.send(chunk)
-                return
+            else:
+                await message.channel.send(f"Error: Passport stamp data is None")
+            # if not self.api_responses:
+            #     await message.channel.send("Please input a wallet addresss to analyze. Then ask again.")
+            #     return None
 
+            # cached_addresses = list(self.api_responses.keys())
+            # latest_address = cached_addresses[-1]
+            # await message.channel.send(latest_address)
+
+            # if 'passportStamps' in self.api_responses[latest_address] and self.api_responses[latest_address]['passportStamps']:
+            #     await message.channel.send('passport stamps in cache')
+            #     data = self.api_responses[latest_address]['passportStamps']
+            #     # Check if the data is not None
+            #     if data is not None:
+            #         await message.channel.send(f"Successfully got passport data!")
+            #         target_groups = ["Account Name", "NFT Holder"]
+            #         category = 'Humanity'
+            #         passport_data_chunks = parse_passport_groups(
+            #             data, target_groups, category)
+            #         for chunk in passport_data_chunks:
+            #             await message.channel.send(chunk)
+
+            #         self.api_responses[latest_address]['passportStamps'] = data
+            #     else:
+            #         await message.channel.send(f"Error: Passport stamp data is None")
+
+            # else:
+            #     await message.channel.send('passport stamps NOT in cache')
+
+        # [TODO] add more here for other asks
         if message.content.startswith("!ask "):
             query = message.content[len("!ask "):]
             category = classify_message(query)
-            await message.channel.send(f"Classified as: " + category)
+            await message.channel.send(f"This question was classified as: " + category)
+
+            if not self.api_responses:
+                await message.channel.send("Please input a wallet addresss to analyze. Then ask again.")
+                return None
+
+            cached_addresses = list(self.api_responses.keys())
+            latest_address = cached_addresses[-1]
+            await message.channel.send(latest_address)
+
+            passportStamps = {}
+            if 'passportStamps' in self.api_responses[latest_address]:
+                passportStamps = self.api_responses[latest_address]['passportStamps']
+
+            passport = {}
+            if 'passport' in self.api_responses[latest_address]:
+                passport = self.api_responses[latest_address]['passport']
+
             if category == "Humanity":
-                # get all humanity stamps and print
-                await message.channel.send(category)
+                if passport is not None:
+                    print(passport['score'])
+                    passport_score = passport['score']
+                    await message.channel.send(f"The user " + latest_address + " has a passport score of " + passport_score)
+                    # [TODO] add in stamps into chat gpt to add extra knowledge. 
+                    prompt = f"As an expert in Gitcoin Passport, your role is to provide detailed information and insights about the humanity of the user. Gitcoin Passport is a vital identity verification application and Sybil resistance protocol, designed to enhance the security and integrity of digital communities and projects. Your responses should be informed, precise, and helpful to users in determing humanity. Explain how likely the user is to be human based on a passport score of {passport_score} and the ownership of the following stamps."
+                    try:
+                        response = openai.Completion.create(
+                            model="text-davinci-003", prompt=prompt, temperature=0.6, max_tokens=200)
+                        await message.channel.send(response.choices[0].text.strip())
+                    except RateLimitError:
+                        await message.channel.send("Sorry, I'm getting too many requests right now. Please try again later.")
+                        # Introducing a delay. Adjust as needed.
+                        await asyncio.sleep(10)
+
+
+                if passportStamps is not None:
+                    # [TODO] edit target_groups to those that represent humanity
+                    target_groups = ["Account Name",  "Account Creation", "Government ID", "CAPTCHA Pass", "Uniqueness Pass", "Liveness Pass"]
+                    category = 'humanity'
+                    passport_data_chunks = parse_passport_groups(
+                        passportStamps, target_groups, category)
+                    for chunk in passport_data_chunks:
+                        await message.channel.send(chunk)
+                else:
+                    await message.channel.send(f"Error: Passport stamp data is None")
+
                 return
             elif category == "Gitcoin involvement":
-                await message.channel.send(category)
+                if passportStamps is not None:
+                    await message.channel.send(f"Successfully got passport data!")
+                    target_groups = ["Self GTC Staking", "Contributed to...", "Contributed ($)..."]
+                    category = 'gitcoin involvement'
+                    passport_data_chunks = parse_passport_groups(
+                        passportStamps, target_groups, category)
+                    for chunk in passport_data_chunks:
+                        await message.channel.send(chunk)
+                else:
+                    await message.channel.send(f"Error: Passport stamp data is None")
                 return
             elif category == "Technical expertise":
-                await message.channel.send(category)
+                if passportStamps is not None:
+                    await message.channel.send(f"Successfully got passport data!")
+                    target_groups = ["Contribution Activity", "Possessions", "Transactions", "NFT Holder"]
+                    category = 'technical expertise'
+                    passport_data_chunks = parse_passport_groups(
+                        passportStamps, target_groups, category)
+                    for chunk in passport_data_chunks:
+                        await message.channel.send(chunk)
+                else:
+                    await message.channel.send(f"Error: Passport stamp data is None")
+                return
+            elif category == "socialness":
+                if passportStamps is not None:
+                    await message.channel.send(f"Successfully got passport data!")
+                    target_groups = ["Snapshot Voter", "Snapshot Proposal Creator", "Lens Handle", "Guild Member"]
+                    category = 'Socialness'
+                    passport_data_chunks = parse_passport_groups(
+                        passportStamps, target_groups, category)
+                    for chunk in passport_data_chunks:
+                        await message.channel.send(chunk)
+                else:
+                    await message.channel.send(f"Error: Passport stamp data is None")
                 return
             else:
-                await message.channel.send(category)
+                await message.channel.send(f"Unable to classify your question. Please ask about their humanity, technical expertise, or involvement in gitcoin.")
                 return
 
 
